@@ -1,6 +1,6 @@
 import express from "express";
 import { authorize } from "../auth";
-import { fetchMessageById, fetchMessageDetails, listEmails } from "../services/gmailService";
+import { fetchLabelDetails, fetchLabels, fetchMessageById, fetchMessageDetails, listEmails } from "../services/gmailService";
 
 const router = express.Router();
 
@@ -25,6 +25,18 @@ router.get("/emails/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching the email.");
+  }
+});
+
+router.get("/labels", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const labels = await fetchLabels(auth);
+    const labelDetails = await fetchLabelDetails(auth, labels);
+    res.status(200).json(labelDetails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching labels.");
   }
 });
 

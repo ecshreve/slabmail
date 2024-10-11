@@ -7,14 +7,13 @@ import EmailItem from './EmailItem';
 interface EmailListProps {
   emails: Email[];
   onEmailClick: (id: string) => void;
-  selectedEmailId: string | null;
 }
 
-const EmailList: React.FC<EmailListProps> = ({ emails, onEmailClick, selectedEmailId }) => {
+const EmailList: React.FC<EmailListProps> = ({ emails, onEmailClick }) => {
   return (
     <List>
       {emails.map((email) => (
-        <EmailItem key={email.id} email={email} onClick={() => onEmailClick(email.id)} selected={selectedEmailId === email.id} />
+        <EmailItem key={email.id} email={email} onClick={() => onEmailClick(email.id)} />
       ))}
     </List>
   );

@@ -6,7 +6,7 @@ import { Auth, gmail_v1, google } from "googleapis";
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
  * @returns {Promise<void>}
  */
-export async function listLabels(auth: Auth.OAuth2Client): Promise<void> {
+export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.labels.list({
     userId: "me",
@@ -14,12 +14,36 @@ export async function listLabels(auth: Auth.OAuth2Client): Promise<void> {
   const labels = res.data.labels;
   if (!labels || labels.length === 0) {
     console.log("No labels found.");
-    return;
+    return [];
   }
-  console.log("Labels:");
-  labels.forEach((label) => {
-    console.log(`- ${label.name}`);
-  });
+  console.log("Labels:", labels.length);
+  return labels
+}
+
+/**
+ * Fetches the details for a label by ID.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the label.
+ * @returns {Promise<any>} The label details.
+ */
+export async function fetchLabelDetails(auth: Auth.OAuth2Client, labels: gmail_v1.Schema$Label[]): Promise<any> {
+  const gmail = google.gmail({ version: "v1", auth });
+  const labelDetails = await Promise.all(
+    labels.map(async (label) => {
+      const res = await gmail.users.labels.get({
+        userId: "me",
+        id: label.id!,
+      });
+      return res.data;
+    })
+  );
+  return labelDetails;
+}
+
+export async function fetchLabelById(auth: Auth.OAuth2Client, id: string): Promise<any> {
+  const label = await fetchLabelDetails(auth, [{id}]);
+  return label[0];
 }
 
 /**
