@@ -1,4 +1,4 @@
-import { Auth, google } from "googleapis";
+import { Auth, gmail_v1, google } from "googleapis";
 
 /**
  * Lists the labels in the user's account.
@@ -43,20 +43,18 @@ export async function listEmails(auth: Auth.OAuth2Client): Promise<any[]> {
   console.log("Messages: ", messages.length);
   return messages;
 }
-
 /**
  * Fetches the details for a list of messages.
  *
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
- * @param {any[]} messages An array of message objects.
+ * @param {gmail_v1.Schema$Message[]} messages An array of message objects.
  * @returns {Promise<any[]>} An array of message details.
  */
 export async function fetchMessageDetails(
   auth: Auth.OAuth2Client,
-  messages: any[]
+  messages: gmail_v1.Schema$Message[]
 ): Promise<any[]> {
   try {
-    // Fetch details for each message
     const gmail = google.gmail({ version: "v1", auth });
     const messageDetails = await Promise.all(
       messages.map(async (message) => {
@@ -70,20 +68,24 @@ export async function fetchMessageDetails(
           subject: msg.data.payload?.headers?.find(
             (header) => header.name === "Subject"
           )?.value,
-          from: msg.data.payload?.headers?.find(
+          sender: msg.data.payload?.headers?.find(
             (header) => header.name === "From"
           )?.value,
+          date: msg.data.internalDate,
+          body: msg.data.payload?.parts?.find((part) => part.mimeType === "text/plain")?.body?.data && Buffer.from(msg.data.payload.parts.find((part) => part.mimeType === "text/plain")!.body!.data!, 'base64').toString('utf-8'),
         };
       })
     );
 
     console.log("Messages: ", messageDetails.length);
-    messageDetails.forEach((message) => {
-      console.log(message);
-    });
     return messageDetails;
   } catch (error) {
     console.error("Error fetching message details:", error);
     throw error; // Re-throw the error to be handled by the caller
   }
+}
+
+export async function fetchMessageById(auth: Auth.OAuth2Client, id: string): Promise<any> {
+  const messages = await fetchMessageDetails(auth, [{id}]);
+  return messages[0];
 }
