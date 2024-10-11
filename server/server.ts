@@ -14,11 +14,12 @@ app.use(cors());
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
+
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = path.join(process.cwd(), "token.json");
-const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
+const TOKEN_PATH = path.join(process.cwd(), "../config/token.json");
+const CREDENTIALS_PATH = path.join(process.cwd(), "../config/credentials.json");
 
 /**
  * Reads previously authorized credentials from the save file.
@@ -146,6 +147,7 @@ async function fetchMessageDetails(auth: Auth.OAuth2Client, messages: any[]): Pr
   }
 }
 
+
 app.get("/api/emails", async (req, res) => {
   try {
     console.log("Fetching emails...");
@@ -159,9 +161,11 @@ app.get("/api/emails", async (req, res) => {
   }
 });
 
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -1,5 +1,14 @@
 # tatemprep
 
+![demo](config/images/demo.jpeg)
+
+## Features
+- [x] Fetch emails from Gmail
+- [x] Display emails in a list
+- [ ] Search emails
+- [ ] Filter emails
+- [ ] Archive/unarchive emails
+
 [!NOTE] This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
 
 ## Usage
@@ -19,10 +28,16 @@ npm start
 
 Access the app at http://localhost:3001
 
-## Backend
+## Project Structure
+
+### `/server`
 
 The backend is a simple Node.js server that uses the Gmail API to fetch emails.
 
-## Frontend
+### `/client`
 
-The frontend is a simple React app that displays the emails fetched from the backend.
+The frontend is a React app that displays a list of emails fetched from the server.
+
+### `/config`
+
+Miscellaneous configuration files, such as the Gmail API credentials which are gitignored.

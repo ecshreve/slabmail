@@ -1,5 +1,5 @@
 General:
-    ☐ Move server code to a subdirectory
+    ✔ Move server code to a subdirectory @done(24-10-11 01:09)
     ☐ Add taskfile
     ☐ Spin up devcontainer
         - This wasn't playing nicely with gmail api auth, revisit
@@ -24,3 +24,4 @@ Backend:
 
 Infra:
     ☐ Collect metrics and expose dashboard (Grafana/Prometheus/Loki)
+    ☐ Dev mode to surface metrics in the app itself (e.g. cache hit rate, latency, errors, etc.)
