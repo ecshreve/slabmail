@@ -1,0 +1,32 @@
+[[task]]
+    id = "dev"
+    type = "long"
+    env = { "APP_ENV" = "DEV" }
+    dependencies = ["backend", "client"]
+    cmd = """
+        echo "Starting the dev server..."
+        echo "APP_ENV: $APP_ENV"
+    """
+
+[[task]]
+    id = "backend"
+    type = "short"
+    watch = ["server/**/*.ts"]
+    cmd = """
+        echo "Running the backend..."
+        cd server
+        npm install
+        npx ts-node server.ts
+    """
+
+[[task]]
+    id = "client"
+    type = "short"
+    watch = ["client/src/**/*.tsx"]
+    env = { "PORT" = "3001" }
+    cmd = """
+        echo "Running the client..."
+        cd client
+        npm install
+        npm start
+    """

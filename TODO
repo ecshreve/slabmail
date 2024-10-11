@@ -1,6 +1,6 @@
 General:
     ✔ Move server code to a subdirectory @done(24-10-11 01:09)
-    ☐ Add taskfile
+    ✔ Add taskfile @done(24-10-11 01:34)
     ☐ Spin up devcontainer
         - This wasn't playing nicely with gmail api auth, revisit
 
@@ -20,7 +20,7 @@ Frontend:
 
 Backend:
     ☐ Clean up gmail api auth
-    ☐ Maybe 
+    ✔ Organize directory structure @done(24-10-11 01:34)
 
 Infra:
     ☐ Collect metrics and expose dashboard (Grafana/Prometheus/Loki)
