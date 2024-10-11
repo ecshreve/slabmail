@@ -2,7 +2,7 @@
 import { authenticate } from "@google-cloud/local-auth";
 import cors from "cors";
 import express from "express";
-import fs from "fs/promises";
+import { promises as fs } from "fs";
 import { Auth, google } from "googleapis";
 import path from "path";
 import process from "process";
