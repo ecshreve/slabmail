@@ -1,0 +1,26 @@
+General:
+    ☐ Move server code to a subdirectory
+    ☐ Add taskfile
+    ☐ Spin up devcontainer
+        - This wasn't playing nicely with gmail api auth, revisit
+
+Features:
+    ☐ Archive/Unarchive emails focus on state persistence and UI updates
+    ☐ Integrate ai agent to summarize and pre-sort emails
+
+Frontend:
+    ☐ Pagination, search, filters
+    ☐ Clean up styling a bit
+    ☐ Type function parameters and helpers
+
+    IndexedDB:
+        ☐ Cache emails in IndexedDB
+        ☐ Fetch from IndexedDB if available
+        ☐ Instrument to track cache hits/misses
+
+Backend:
+    ☐ Clean up gmail api auth
+    ☐ Maybe 
+
+Infra:
+    ☐ Collect metrics and expose dashboard (Grafana/Prometheus/Loki)
