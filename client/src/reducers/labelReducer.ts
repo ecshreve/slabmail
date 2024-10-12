@@ -15,7 +15,7 @@ export type LabelAction =
   | { type: "SELECT_LABEL"; payload: Label }
   | {
       type: "UPDATE_LABEL_COUNT";
-      payload: { labelName: string; delta: number };
+      payload: { labelId: string; delta: number };
     };
 
 export const labelReducer = (
@@ -35,7 +35,7 @@ export const labelReducer = (
       return {
         ...state,
         labels: state.labels.map((label) =>
-          label.name === action.payload.labelName
+          label.id === action.payload.labelId
             ? {
                 ...label,
                 messagesTotal: label.messagesTotal + action.payload.delta,

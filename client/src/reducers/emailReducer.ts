@@ -3,7 +3,6 @@ import { Email } from "../types/Email";
 
 export interface EmailState {
   emails: Email[];
-  selectedEmail: Email | null;
   loading: boolean;
   error: string | null;
 }
@@ -12,8 +11,7 @@ export type EmailAction =
   | { type: "FETCH_EMAILS_START" }
   | { type: "FETCH_EMAILS_SUCCESS"; payload: Email[] }
   | { type: "FETCH_EMAILS_ERROR"; payload: string }
-  | { type: "SELECT_EMAIL"; payload: Email }
-  | { type: "TOGGLE_STAR"; payload: Email };
+  | { type: "TOGGLE_STAR"; payload: { emailId: string; isStarred: boolean } };
 
 export const emailReducer = (
   state: EmailState,
@@ -26,14 +24,12 @@ export const emailReducer = (
       return { ...state, loading: false, emails: action.payload };
     case "FETCH_EMAILS_ERROR":
       return { ...state, loading: false, error: action.payload };
-    case "SELECT_EMAIL":
-      return { ...state, selectedEmail: action.payload };
     case "TOGGLE_STAR":
       return {
         ...state,
         emails: state.emails.map((email) =>
-          email.id === action.payload.id
-            ? { ...email, labelIds: action.payload.labelIds }
+          email.id === action.payload.emailId
+            ? { ...email, isStarred: !action.payload.isStarred }
             : email
         ),
       };

@@ -1,6 +1,6 @@
 import express from "express";
 import { authorize } from "../auth";
-import { fetchLabelDetails, fetchLabels, fetchMessageById, fetchMessageDetails, listEmails, toggleStarEmail } from "../services/gmailService";
+import { fetchLabelDetails, fetchLabels, fetchMessageById, fetchMessageDetails, listEmails, starMessage, unstarMessage } from "../services/gmailService";
 
 const router = express.Router();
 
@@ -28,16 +28,20 @@ router.get("/emails/:id", async (req, res) => {
   }
 });
 
-router.patch("/emails/:id", async (req, res) => {
+router.get("/emails/:id/star", async (req, res) => {
   try {
     const { id } = req.params;
-    const { star } = req.query
+    const { starred } = req.query;
     const auth = await authorize();
-    const result = await toggleStarEmail(auth, id, star === 'true');
-    res.status(200).json(result);
+    if (starred === 'true') {
+      await unstarMessage(auth, id);
+    } else {
+      await starMessage(auth, id);
+    }
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while starring the email.");
+    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
   }
 });
 

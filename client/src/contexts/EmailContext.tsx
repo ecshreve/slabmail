@@ -9,7 +9,6 @@ interface EmailContextType {
 
 const initialState: EmailState = {
   emails: [],
-  selectedEmail: null,
   loading: false,
   error: null,
 };

@@ -19,20 +19,6 @@ export const fetchEmailById = async (id: string): Promise<Email> => {
   return response.json();
 };
 
-// Mark an email as read
-export const markEmailAsRead = async (id: string): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}/read`, { method: "PATCH" });
-  handleError(response);
-};
-
-// Archive an email
-export const archiveEmail = async (id: string): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}/archive`, {
-    method: "PATCH",
-  });
-  handleError(response);
-};
-
 // Fetch all labels
 export const fetchLabels = async (): Promise<Label[]> => {
   const response = await fetch(`${BASE_URL}/labels`);
@@ -40,21 +26,11 @@ export const fetchLabels = async (): Promise<Label[]> => {
   return response.json();
 };
 
-// Star an email
-export const updateStarredLabel = async (id: string, newStarredValue: boolean): Promise<Email> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}?star=${newStarredValue}`, { method: "PATCH" });
+// Update the starred status of an email
+export const updateEmailStarred = async (id: string, starred: boolean): Promise<Email> => {
+  const response = await fetch(`${BASE_URL}/emails/${id}/star?starred=${starred}`);
   handleError(response);
   return response.json();
 };
 
-// Star an email
-export const starEmail = async (id: string): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}?star=true`, { method: "PATCH" });
-  handleError(response);
-};
-
-// Unstar an email
-export const unstarEmail = async (id: string): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}?star=false`, { method: "PATCH" });
-  handleError(response);
-};
+// 

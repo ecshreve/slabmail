@@ -1,6 +1,6 @@
-import { Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
 import LabelList from '../components/label/LabelList';
@@ -9,15 +9,17 @@ import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { EmailContext } from '../contexts/EmailContext';
 import { LabelContext } from '../contexts/LabelContext';
-import { fetchEmails, fetchLabels, updateStarredLabel } from '../services/emailService';
+import { fetchEmails, fetchLabels, updateEmailStarred } from '../services/emailService';
 import { Email } from '../types/Email';
 import { Label } from '../types/Label';
 
 const Inbox: React.FC = () => {
   const { state: emailState, dispatch: emailDispatch } = useContext(EmailContext);
   const { state: labelState, dispatch: labelDispatch } = useContext(LabelContext);
-  const { emails, loading: emailLoading, error: emailError, selectedEmail } = emailState;
+  const { emails, loading: emailLoading, error: emailError } = emailState;
   const { labels, loading: labelLoading, error: labelError, selectedLabel } = labelState;
+
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
 
   // Fetch emails when the component mounts
   useEffect(() => {
@@ -42,17 +44,13 @@ const Inbox: React.FC = () => {
   }, [emailDispatch, labelDispatch]);
 
   // Handle toggling the star and updating the label count
-  const handleToggleStar = async (emailId: string, newStarredValue: boolean) => {
+  const handleToggleStar = async (emailId: string, isStarred: boolean) => {
     try {
-      await updateStarredLabel(emailId, newStarredValue);
-      const email = emails.find(e => e.id === emailId);
-      if (!email) return;
-      emailDispatch({ type: 'TOGGLE_STAR', payload: { ...email, labelIds: newStarredValue ? [...email.labelIds, 'STARRED'] : email.labelIds.filter(id => id !== 'STARRED')} });
-
-      // Update the label count in the label reducer
+      await updateEmailStarred(emailId, isStarred);
+      emailDispatch({ type: 'TOGGLE_STAR', payload: { emailId, isStarred } });
       labelDispatch({
         type: 'UPDATE_LABEL_COUNT',
-        payload: { labelName: 'STARRED', delta: newStarredValue ? 1 : -1 },
+        payload: { labelId: 'STARRED', delta: isStarred ? -1 : 1 },
       });
     } catch (error) {
       console.error('Error toggling star status', error);
@@ -63,9 +61,10 @@ const Inbox: React.FC = () => {
     labelDispatch({ type: 'SELECT_LABEL', payload: label });
   };
 
-  const handleSelectEmail = (email: Email) => {
-    emailDispatch({ type: 'SELECT_EMAIL', payload: email });
+  const handleEmailSelect = (email: Email) => {
+    setSelectedEmail(email); // Update the selected email state
   };
+  
 
   if (emailLoading || labelLoading) return <LoadingSpinner />;
   if (emailError || labelError) return <ErrorComponent message={emailError || labelError || ''} />;
@@ -81,16 +80,19 @@ const Inbox: React.FC = () => {
         {/* Left Column: Email List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
           <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabel?.name || 'All Emails'}</Typography>
-          <EmailList emails={emails} onToggleStar={(emailId, newStarredValue) => handleToggleStar(emailId, newStarredValue)} onSelectEmail={handleSelectEmail} />
+          <EmailList 
+            emails={emails} 
+            onSelectEmail={handleEmailSelect} 
+            onToggleStar={handleToggleStar} 
+          />
         </Grid>
         {/* Right Column: Email Details */}
         <Grid size={7} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
           {selectedEmail && (
-            <EmailDetails email={selectedEmail} />
-          ) || (
-            <Box sx={{ padding: '16px' }}>
-              <p>Select an email to view details</p>
-            </Box>
+            <EmailDetails 
+              email={emails.find(e => e.id === selectedEmail.id) || selectedEmail} 
+              onToggleStar={handleToggleStar} 
+            />
           )}
         </Grid>
       </Grid>
