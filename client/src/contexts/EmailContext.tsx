@@ -1,22 +1,24 @@
 // /contexts/EmailContext.tsx
-import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { Email } from '../types/Email';
-import { Label } from '../types/Label';
+import React, { createContext, ReactNode, useContext, useReducer } from 'react';
+import { emailState, emailReducer, emailAction } from '../reducers/emailReducer';
+
 interface EmailContextType {
-  emails: Email[];
-  labels: Label[];
-  setEmails: (emails: Email[]) => void;
-  setLabels: (labels: Label[]) => void;
+  state: emailState;
+  dispatch: React.Dispatch<emailAction>;
 }
 
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
 
 export const EmailProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [emails, setEmails] = useState<Email[]>([]);
-  const [labels, setLabels] = useState<Label[]>([]);
-  
+  const [state, dispatch] = useReducer(emailReducer, {
+    emails: [],
+    labels: [],
+    selectedEmail: null,
+    selectedLabel: null,
+  });
+
   return (
-    <EmailContext.Provider value={{ emails, labels, setEmails, setLabels }}>
+    <EmailContext.Provider value={{ state, dispatch }}>
       {children}
     </EmailContext.Provider>
   );

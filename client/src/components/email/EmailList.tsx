@@ -6,15 +6,15 @@ import EmailItem from './EmailItem';
 
 interface EmailListProps {
   emails: Email[];
-  onEmailClick: (id: string) => void;
-  onToggleStar: (id: string) => void;
+  onSelectEmail: (email: Email) => void;
+  onToggleStar: (email: Email) => void;
 }
 
-const EmailList: React.FC<EmailListProps> = ({ emails, onEmailClick, onToggleStar }) => {
+const EmailList: React.FC<EmailListProps> = ({ emails, onSelectEmail, onToggleStar }) => {  
   return (
     <List>
       {emails.map((email) => (
-        <EmailItem key={email.id} email={email} onClick={() => onEmailClick(email.id)} onToggleStar={onToggleStar}/>
+        <EmailItem key={email.id} email={email} onSelectEmail={onSelectEmail} onToggleStar={onToggleStar} />
       ))}
     </List>
   );

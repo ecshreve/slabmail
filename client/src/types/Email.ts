@@ -5,5 +5,4 @@ export interface Email {
   sender: string;
   date: string;
   labelIds: string[];
-  isStarred: boolean;
 }

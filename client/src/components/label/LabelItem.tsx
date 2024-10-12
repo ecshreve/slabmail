@@ -1,14 +1,26 @@
 import { Box, ListItem, ListItemText } from "@mui/material";
+import { useEffect, useState } from "react";
 import theme from "../../styles/theme";
 import { Label } from "../../types/Label";
+
 interface LabelItemProps {
   label: Label;
+  onSelectLabel: (label: Label) => void;
 }
 
-export default function LabelItem({ label }: LabelItemProps) {
+export default function LabelItem({ label, onSelectLabel }: LabelItemProps) {
+  const [ highlight, setHighlight ] = useState(false);
+
+  useEffect(() => {
+    setHighlight(true);
+    const timeout = setTimeout(() => setHighlight(false), 3000);
+    return () => clearTimeout(timeout);
+  }, [label.messagesTotal]);
+
   return (
     <ListItem
       component="button"
+      onClick={() => onSelectLabel(label)}
       sx={{
         padding: '8px 12px',
         margin: '4px 0',
@@ -38,11 +50,15 @@ export default function LabelItem({ label }: LabelItemProps) {
         }}
       />
         <ListItemText
-          sx={{ textAlign: 'right' }}
+          sx={{ 
+            textAlign: 'right', 
+          }}
           secondary={`(${label.messagesTotal})`}
           secondaryTypographyProps={{
             variant: 'body2',
-            }}
+            color: highlight ? theme.palette.primary.main : 'inherit',
+            fontWeight: highlight ? 'bolder' : 'normal'
+          }}
         />
       </Box>
     </ListItem>

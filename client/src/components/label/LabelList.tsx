@@ -6,13 +6,14 @@ import LabelItem from './LabelItem';
 
 interface LabelListProps {
   labels: Label[];
+  onSelectLabel: (label: Label) => void;
 }
 
-const LabelList: React.FC<LabelListProps> = ({ labels }) => {
+const LabelList: React.FC<LabelListProps> = ({ labels, onSelectLabel }) => {
   return (
     <List sx={{ padding: 0, borderRadius: '3px' }}>
       {labels.map((label) => (
-        <LabelItem key={label.id} label={label} />
+        <LabelItem key={label.id} label={label} onSelectLabel={onSelectLabel} />
       ))}
     </List>
   );

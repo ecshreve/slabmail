@@ -9,7 +9,11 @@ interface UseIndexedDbReturn {
 }
 
 const useIndexedDb = (): UseIndexedDbReturn => {
-  const { setEmails } = useEmailContext();
+  const { dispatch } = useEmailContext();
+  
+  const setEmails = (emails: Email[]) => {
+    dispatch({ type: 'SET_EMAILS', payload: emails });
+  };
 
   const dbPromise = openDB('email-db', 1, {
     upgrade(db) {
