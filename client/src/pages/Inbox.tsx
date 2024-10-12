@@ -17,9 +17,10 @@ const Inbox: React.FC = () => {
   const { state: emailState, dispatch: emailDispatch } = useContext(EmailContext);
   const { state: labelState, dispatch: labelDispatch } = useContext(LabelContext);
   const { emails, loading: emailLoading, error: emailError } = emailState;
-  const { labels, loading: labelLoading, error: labelError, selectedLabel } = labelState;
+  const { labels, loading: labelLoading, error: labelError } = labelState;
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
 
   // Fetch emails when the component mounts
   useEffect(() => {
@@ -57,14 +58,17 @@ const Inbox: React.FC = () => {
     }
   };
 
-  const handleSelectLabel = (label: Label) => {
-    labelDispatch({ type: 'SELECT_LABEL', payload: label });
-  };
-
   const handleEmailSelect = (email: Email) => {
     setSelectedEmail(email); // Update the selected email state
   };
   
+  const handleLabelSelect = (label: Label) => {
+    if (selectedLabel?.id === label.id) {
+      setSelectedLabel(null);
+    } else {
+      setSelectedLabel(label); // Update the selected label state
+    }
+  };
 
   if (emailLoading || labelLoading) return <LoadingSpinner />;
   if (emailError || labelError) return <ErrorComponent message={emailError || labelError || ''} />;
@@ -75,13 +79,18 @@ const Inbox: React.FC = () => {
       <Grid container display="flex" height="100vh" spacing={2}>
         {/* Left Column: Label List */}
         <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
-          <LabelList labels={labels} onSelectLabel={handleSelectLabel} />
+          <LabelList 
+            labels={labels} 
+            selectedLabel={selectedLabel} 
+            onSelectLabel={handleLabelSelect} 
+          />
         </Grid>
         {/* Left Column: Email List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-          <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabel?.name || 'All Emails'}</Typography>
+          <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabel ? selectedLabel.name : 'All Emails'}</Typography>
           <EmailList 
-            emails={emails} 
+            emails={emails.filter(email => selectedLabel ? email.labelIds.includes(selectedLabel.id) : true)} 
+            selectedEmail={selectedEmail}
             onSelectEmail={handleEmailSelect} 
             onToggleStar={handleToggleStar} 
           />

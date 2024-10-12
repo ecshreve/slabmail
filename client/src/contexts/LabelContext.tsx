@@ -9,7 +9,6 @@ interface LabelContextType {
 
 const initialState: LabelState = {
   labels: [],
-  selectedLabel: null,
   loading: false,
   error: null,
 };

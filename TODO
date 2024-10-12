@@ -5,7 +5,7 @@ General:
         - This wasn't playing nicely with gmail api auth, revisit
 
 Features:
-    ☐ Archive/Unarchive emails focus on state persistence and UI updates
+    ✔ Star/Unstar emails focus on state persistence and UI updates @done(24-10-12 15:34)
     ☐ Integrate ai agent to summarize and pre-sort emails
 
 Frontend:
@@ -21,7 +21,7 @@ Frontend:
         ☐ Instrument to track cache hits/misses
 
 Backend:
-    ☐ Clean up gmail api auth
+    ✔ Clean up gmail api auth @done(24-10-12 15:34)
     ✔ Organize directory structure @done(24-10-11 01:34)
 
 Infra:

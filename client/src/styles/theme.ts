@@ -5,10 +5,13 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#007bff', // Light blue
+      main: '#263E3F',
+      dark: '#172526',
     },
     secondary: {
-      main: '#f50057', // Accent color (red) for actions like Delete or Archive
+      main: '#EBc4E7', // Accent color (red) for actions like Delete or Archive
+      light: '#EBd4E7',
+
     },
     text: {
       primary: '#333', // Darker text color for main content
@@ -18,10 +21,11 @@ const theme = createTheme({
       default: '#f4f4f4', // Light background for a cleaner look
     },
     action: {
-      selected: '#e8f0fe', // Light blue selected effect on emails
-      focus: '#fff0fe', // Mid blue focus effect on emails
-      hover: '#a2e3fc', // Darker blue hover effect on emails or buttons
+      selected: '#EBF4E7',
+      hover: '#9F9F9F',
+      focus: '#172526',
     },
+    divider: '#E0E0E0',
   },
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',

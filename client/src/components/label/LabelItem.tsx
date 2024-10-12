@@ -5,10 +5,11 @@ import { Label } from "../../types/Label";
 
 interface LabelItemProps {
   label: Label;
+  isSelected: boolean;
   onSelectLabel: (label: Label) => void;
 }
 
-export default function LabelItem({ label, onSelectLabel }: LabelItemProps) {
+export default function LabelItem({ label, isSelected, onSelectLabel }: LabelItemProps) {
   const [ highlight, setHighlight ] = useState(false);
 
   useEffect(() => {
@@ -21,25 +22,18 @@ export default function LabelItem({ label, onSelectLabel }: LabelItemProps) {
     <ListItem
       component="button"
       onClick={() => onSelectLabel(label)}
-      sx={{
+        sx={{ 
         padding: '8px 12px',
         margin: '4px 0',
         borderRadius: '3px', // Slight rounding for a modern look
         border: 'none',
+        borderLeft: isSelected ? '4px solid ' + theme.palette.secondary.main : 'none',
+        borderRight: highlight ? '10px solid ' + theme.palette.secondary.main : 'none',
+        backgroundColor: isSelected ? theme.palette.action.selected : theme.palette.action.selected + '80',
         '&:hover': {
           backgroundColor: theme.palette.action.hover, // Material-UI action hover color
           cursor: 'pointer',
-        },
-        '&:focus': {
-          outline: `2px solid ${theme.palette.action.focus}`, // Blue outline when focused
-          backgroundColor: theme.palette.action.focus,
-        },
-        '&.Mui-selected': {
-          backgroundColor: theme.palette.action.selected, // Light blue for selected state
-          '&:hover': {
-            backgroundColor: theme.palette.action.hover, // Darker blue on hover while selected
-          },
-        },
+        }
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>

@@ -1,15 +1,15 @@
 # tatemprep
 
-![demo](config/images/demo.jpeg)
+![demo](config/images/ddemo.gif)
 
 ## Features
 - [x] Fetch emails from Gmail
 - [x] Display emails in a list
 - [x] Display labels in a sidebar
 - [x] Display email content
+- [x] Star/unstar emails
 - [ ] Search emails
 - [ ] Filter emails
-- [ ] Archive/unarchive emails
 
 [!NOTE] This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
 
