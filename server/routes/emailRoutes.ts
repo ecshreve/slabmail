@@ -28,12 +28,12 @@ router.get("/emails/:id", async (req, res) => {
   }
 });
 
-router.patch("/emails/:id/star", async (req, res) => {
+router.patch("/emails/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { star } = req.query
     const auth = await authorize();
-    const result = await toggleStarEmail(auth, id, star !== undefined);
+    const result = await toggleStarEmail(auth, id, star === 'true');
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

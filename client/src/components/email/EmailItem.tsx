@@ -1,64 +1,34 @@
-// /components/Email/EmailItem.tsx
+// /components/EmailItem.tsx
+import { Box, ListItem, ListItemText } from '@mui/material';
+import React, { useState } from 'react';
 
-import { Star, StarOutline } from '@mui/icons-material';
-import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import React from 'react';
 import theme from '../../styles/theme';
 import { Email } from '../../types/Email';
-
+import EmailActions from './EmailAction';
 
 interface EmailItemProps {
-  email: Email;
-  onSelectEmail: (email: Email) => void;
-  onToggleStar: (email: Email) => void;
+  email: Email; // Define your email type here
+  onSelectEmail: (email: Email) => void; // Passed down from parent
+  onClickStar: (emailId: string, newStarredValue: boolean) => void; // Passed down from parent
 }
 
-const EmailItem: React.FC<EmailItemProps> = ({ email, onSelectEmail, onToggleStar }) => {
+const EmailItem: React.FC<EmailItemProps> = ({ email, onSelectEmail, onClickStar }) => {
+  const [isStarred, setIsStarred] = useState(email.labelIds.includes('STARRED')); // Local state for instant feedback
+
+  const handleStarClick = () => {
+    const newStarredValue = !isStarred;
+    setIsStarred(newStarredValue); // Provide immediate feedback locally
+    onClickStar(email.id, newStarredValue); // Dispatch star update to parent
+  };
 
   return (
-    <ListItem
-      component="button"
-      onClick={() => onSelectEmail(email)}
-      sx={{
-        padding: '12px 16px',
-        '&:hover': {
-          backgroundColor: theme.palette.action.hover,
-        },
-        '&:focus': {
-          outline: `2px solid ${theme.palette.action.focus}`,
-          backgroundColor: theme.palette.action.focus,
-          '&:hover': {
-            backgroundColor: theme.palette.action.hover,
-          },
-        },
-        '&.Mui-selected': {
-          backgroundColor: theme.palette.action.selected,
-          '&:hover': {
-            backgroundColor: theme.palette.action.hover,
-          },
-        },
-      }}
-    >
-      <ListItemText
-        primaryTypographyProps={{
-          variant: 'h5', // Make subject more prominent
-          noWrap: true,  // No wrapping to keep it in one line
-        }}
-        secondaryTypographyProps={{
-          variant: 'body2', // Use lighter color for secondary text (sender, date)
-        }}
-        primary={email.subject}
-        secondary={`${email.sender} - ${new Date(parseInt(email.date)).toLocaleString()}`}
-
-      />
-      <ListItemIcon sx={{ minWidth: 'auto' }} onClick={() => {
-        onToggleStar(email);
-      }}
-      >
-        {email.labelIds.includes('STARRED') ? <Star sx={{ '&:hover': { color: theme.palette.primary.main } }} /> : <StarOutline sx={{ '&:hover': { color: theme.palette.secondary.main } }} />}
-      </ListItemIcon>
+    <ListItem onClick={() => onSelectEmail(email)} sx={{ padding: '8px 12px', borderRadius: '3px', borderBottom: '1px solid #e0e0e0', '&:hover': { backgroundColor: theme.palette.action.hover, cursor: 'pointer' } }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <ListItemText primary={email.subject} secondary={`${email.sender} - ${new Date(parseInt(email.date)).toLocaleDateString()}`} />
+      </Box>
+      <EmailActions starred={isStarred} onStar={handleStarClick} onArchive={() => {}} onMarkAsRead={() => {}} />
     </ListItem>
   );
 };
 
-export default EmailItem; 
+export default EmailItem;

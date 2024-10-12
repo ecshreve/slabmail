@@ -7,14 +7,14 @@ import EmailItem from './EmailItem';
 interface EmailListProps {
   emails: Email[];
   onSelectEmail: (email: Email) => void;
-  onToggleStar: (email: Email) => void;
+  onToggleStar: (emailId: string, newStarredValue: boolean) => void;
 }
 
 const EmailList: React.FC<EmailListProps> = ({ emails, onSelectEmail, onToggleStar }) => {  
   return (
-    <List>
+    <List sx={{ display: 'flex', flexDirection: 'column', padding: 0, borderRadius: '3px', gap: '10px' }} >
       {emails.map((email) => (
-        <EmailItem key={email.id} email={email} onSelectEmail={onSelectEmail} onToggleStar={onToggleStar} />
+        <EmailItem key={email.id} email={email} onSelectEmail={onSelectEmail} onClickStar={onToggleStar} />
       ))}
     </List>
   );

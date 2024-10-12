@@ -28,6 +28,7 @@ export default function LabelItem({ label, onSelectLabel }: LabelItemProps) {
         border: 'none',
         '&:hover': {
           backgroundColor: theme.palette.action.hover, // Material-UI action hover color
+          cursor: 'pointer',
         },
         '&:focus': {
           outline: `2px solid ${theme.palette.action.focus}`, // Blue outline when focused
@@ -50,6 +51,7 @@ export default function LabelItem({ label, onSelectLabel }: LabelItemProps) {
         }}
       />
         <ListItemText
+          className={highlight ? 'smooth-transition' : ''}
           sx={{ 
             textAlign: 'right', 
           }}

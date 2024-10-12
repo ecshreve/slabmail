@@ -41,8 +41,20 @@ export const fetchLabels = async (): Promise<Label[]> => {
 };
 
 // Star an email
-export const updateStarredLabel = async (id: string, star: boolean): Promise<Email> => {
-  const response = await fetch(`${BASE_URL}/emails/${id}/star${star ? "?star=true" : ""}`, { method: "PATCH" });
+export const updateStarredLabel = async (id: string, newStarredValue: boolean): Promise<Email> => {
+  const response = await fetch(`${BASE_URL}/emails/${id}?star=${newStarredValue}`, { method: "PATCH" });
   handleError(response);
   return response.json();
+};
+
+// Star an email
+export const starEmail = async (id: string): Promise<void> => {
+  const response = await fetch(`${BASE_URL}/emails/${id}?star=true`, { method: "PATCH" });
+  handleError(response);
+};
+
+// Unstar an email
+export const unstarEmail = async (id: string): Promise<void> => {
+  const response = await fetch(`${BASE_URL}/emails/${id}?star=false`, { method: "PATCH" });
+  handleError(response);
 };

@@ -1,6 +1,7 @@
 // /hooks/useIndexedDb.ts
 import { openDB } from 'idb';
-import { useEmailContext } from '../contexts/EmailContext';
+import { useContext } from 'react';
+import { EmailContext } from '../contexts/EmailContext';
 import { Email } from '../types/Email';
 
 interface UseIndexedDbReturn {
@@ -9,10 +10,10 @@ interface UseIndexedDbReturn {
 }
 
 const useIndexedDb = (): UseIndexedDbReturn => {
-  const { dispatch } = useEmailContext();
-  
+  const { dispatch } = useContext(EmailContext);
+
   const setEmails = (emails: Email[]) => {
-    dispatch({ type: 'SET_EMAILS', payload: emails });
+    dispatch({ type: 'FETCH_EMAILS_SUCCESS', payload: emails });
   };
 
   const dbPromise = openDB('email-db', 1, {

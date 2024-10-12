@@ -1,49 +1,42 @@
+// /reducers/emailReducer.ts
 import { Email } from "../types/Email";
-import { Label } from "../types/Label";
 
-export type emailState = {
+export interface EmailState {
   emails: Email[];
-  labels: Label[];
   selectedEmail: Email | null;
-  selectedLabel: Label | null;
-};
+  loading: boolean;
+  error: string | null;
+}
 
-export type emailAction =
-  | { type: "SET_EMAILS"; payload: Email[] }
-  | { type: "SET_LABELS"; payload: Label[] }
-  | { type: "SET_SELECTED_EMAIL"; payload: Email }
-  | { type: "SET_SELECTED_LABEL"; payload: Label }
+export type EmailAction =
+  | { type: "FETCH_EMAILS_START" }
+  | { type: "FETCH_EMAILS_SUCCESS"; payload: Email[] }
+  | { type: "FETCH_EMAILS_ERROR"; payload: string }
+  | { type: "SELECT_EMAIL"; payload: Email }
   | { type: "TOGGLE_STAR"; payload: Email };
 
-export const emailReducer = (state: emailState, action: emailAction): emailState => {
+export const emailReducer = (
+  state: EmailState,
+  action: EmailAction
+): EmailState => {
   switch (action.type) {
-    case "SET_EMAILS":
-      return { ...state, emails: action.payload };
-    case "SET_LABELS":
-      return { ...state, labels: action.payload };
-    case "SET_SELECTED_EMAIL":
+    case "FETCH_EMAILS_START":
+      return { ...state, loading: true, error: null };
+    case "FETCH_EMAILS_SUCCESS":
+      return { ...state, loading: false, emails: action.payload };
+    case "FETCH_EMAILS_ERROR":
+      return { ...state, loading: false, error: action.payload };
+    case "SELECT_EMAIL":
       return { ...state, selectedEmail: action.payload };
-    case "SET_SELECTED_LABEL":
-      return { ...state, selectedLabel: action.payload };
     case "TOGGLE_STAR":
       return {
         ...state,
-        labels: state.labels.map((label) =>
-          label.id === 'STARRED'
-            ? { ...label, messagesTotal: label.messagesTotal + (action.payload.labelIds.includes('STARRED') ? -1 : 1) }
-            : label
-        ),
         emails: state.emails.map((email) =>
           email.id === action.payload.id
-            ? { 
-                ...email, 
-                starred: !email.labelIds.includes('STARRED'), 
-                labelIds: email.labelIds.includes('STARRED') ? email.labelIds.filter((labelId) => labelId !== 'STARRED') : [...email.labelIds, 'STARRED'] 
-              }
+            ? { ...email, labelIds: action.payload.labelIds }
             : email
         ),
       };
-   
     default:
       return state;
   }

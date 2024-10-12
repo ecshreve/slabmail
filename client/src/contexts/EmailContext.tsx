@@ -1,31 +1,30 @@
 // /contexts/EmailContext.tsx
-import React, { createContext, ReactNode, useContext, useReducer } from 'react';
-import { emailState, emailReducer, emailAction } from '../reducers/emailReducer';
+import React, { createContext, ReactNode, useReducer } from 'react';
+import { EmailAction, emailReducer, EmailState } from '../reducers/emailReducer';
 
 interface EmailContextType {
-  state: emailState;
-  dispatch: React.Dispatch<emailAction>;
+  state: EmailState;
+  dispatch: React.Dispatch<EmailAction>;
 }
 
-const EmailContext = createContext<EmailContextType | undefined>(undefined);
+const initialState: EmailState = {
+  emails: [],
+  selectedEmail: null,
+  loading: false,
+  error: null,
+};
 
-export const EmailProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(emailReducer, {
-    emails: [],
-    labels: [],
-    selectedEmail: null,
-    selectedLabel: null,
-  });
+export const EmailContext = createContext<EmailContextType>({
+  state: initialState,
+  dispatch: () => null,
+});
+
+export const EmailProvider = ({ children }: { children: ReactNode }) => {
+  const [state, dispatch] = useReducer(emailReducer, initialState);
 
   return (
     <EmailContext.Provider value={{ state, dispatch }}>
       {children}
     </EmailContext.Provider>
   );
-};
-
-export const useEmailContext = () => {
-  const context = useContext(EmailContext);
-  if (!context) throw new Error('useEmailContext must be used within EmailProvider');
-  return context;
 };

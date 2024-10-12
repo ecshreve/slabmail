@@ -4,7 +4,7 @@ import EmailActions from '../components/email/EmailAction';
 import EmailDetails from '../components/email/EmailDetails';
 import ErrorComponent from '../components/shared/ErrorComponent';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
-import { archiveEmail, fetchEmailById, markEmailAsRead } from '../services/emailService'; // Assume these are in emailService
+import { archiveEmail, fetchEmailById, markEmailAsRead, starEmail } from '../services/emailService'; // Assume these are in emailService
 
 const EmailView: React.FC = () => {
   const { emailId } = useParams<{ emailId: string }>(); // Retrieve emailId from URL params
@@ -29,6 +29,14 @@ const EmailView: React.FC = () => {
     getEmailDetails();
   }, [emailId]); // Re-run the effect if the emailId changes
 
+  const handleStar = async () => {
+    if (!emailId) return;
+    try {
+      await starEmail(emailId);
+    } catch (err) {
+      setError('Failed to star the email.');
+    }
+  };
 
   const handleMarkAsRead = async () => {
     if (!emailId) return;
@@ -62,6 +70,8 @@ const EmailView: React.FC = () => {
         <>
           <EmailDetails email={email} />
           <EmailActions
+            starred={email.labelIds.includes('STARRED')}
+            onStar={handleStar}
             onMarkAsRead={handleMarkAsRead}
             onArchive={handleArchive}
           />
