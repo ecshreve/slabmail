@@ -43,7 +43,7 @@ const EmailItem: React.FC<EmailItemProps> = ({ email, onClick }) => (
         variant: 'body2', // Use lighter color for secondary text (sender, date)
       }}
       primary={email.subject}
-      secondary={`${email.sender} - ${new Date(email.date).toLocaleString()}`}
+      secondary={`${email.sender} - ${new Date(parseInt(email.date)).toLocaleString()}`}
     />
   </ListItem>
 );

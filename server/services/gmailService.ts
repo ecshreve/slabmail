@@ -16,8 +16,11 @@ export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
     console.log("No labels found.");
     return [];
   }
-  console.log("Labels:", labels.length);
-  return labels
+
+  // Ignore labels that start with "CATEGORY_"
+  const filteredLabels = labels.filter((label) => !label.name?.startsWith("CATEGORY_"));
+  console.log("Labels:", filteredLabels.length, "filtered out:", labels.length - filteredLabels.length);
+  return filteredLabels;
 }
 
 /**

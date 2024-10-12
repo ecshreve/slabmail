@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1a73e8', // Blue (similar to Gmail)
+      main: '#007bff', // Light blue
     },
     secondary: {
       main: '#f50057', // Accent color (red) for actions like Delete or Archive

@@ -11,7 +11,7 @@ interface LabelListProps {
 
 const LabelList: React.FC<LabelListProps> = ({ labels, onLabelClick }) => {
   return (
-    <List>
+    <List sx={{ padding: 0, borderRadius: '3px' }}>
       {labels.map((label) => (
         <LabelItem
           key={label.id}

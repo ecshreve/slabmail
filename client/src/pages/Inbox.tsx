@@ -4,6 +4,7 @@ import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
 import LabelList from '../components/label/LabelList';
 import ErrorComponent from '../components/shared/ErrorComponent';
+import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { fetchEmails, fetchLabels } from '../services/emailService'; // API service
 import { Email } from '../types/Email';
@@ -16,7 +17,7 @@ const Inbox: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null); // Track selected email
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null); // Track selected label
-  
+
   useEffect(() => {
     const getLabelsAndEmails = async () => {
       try {
@@ -53,28 +54,31 @@ const Inbox: React.FC = () => {
   if (error) return <ErrorComponent message={error} />;
 
   return (
-    <Grid container display="flex" height="100vh">
-      {/* Left Column: Label List */}
-      <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-        <LabelList labels={labels} onLabelClick={handleLabelClick} />
-      </Grid>
+    <>
+      <Header />
+      <Grid container display="flex" height="100vh" spacing={2}>
+        {/* Left Column: Label List */}
+        <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
+          <LabelList labels={labels} onLabelClick={handleLabelClick} />
+        </Grid>
 
-      {/* Left Column: Email List */}
-      <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-        <EmailList emails={emails} onEmailClick={handleEmailClick} />
-      </Grid>   
+        {/* Left Column: Email List */}
+        <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
+          <EmailList emails={emails} onEmailClick={handleEmailClick} />
+        </Grid>
 
-      {/* Right Column: Email Details */}
-      <Grid size={7} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
-        {selectedEmail ? (
-          <EmailDetails email={selectedEmail} />
-        ) : (
-          <Grid display="flex" justifyContent="center" alignItems="center" height="100%">
-            <p>Select an email to view details</p>
-          </Grid>
-        )}
+        {/* Right Column: Email Details */}
+        <Grid size={7} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
+          {selectedEmail ? (
+            <EmailDetails email={selectedEmail} />
+          ) : (
+            <Grid display="flex" justifyContent="center" alignItems="center" height="100%">
+              <p>Select an email to view details</p>
+            </Grid>
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 
