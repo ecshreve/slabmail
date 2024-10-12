@@ -2,7 +2,6 @@
 import cors from "cors";
 import express from "express";
 import emailRoutes from "./routes/emailRoutes";
-
 const app = express();
 const PORT = 3000;
 

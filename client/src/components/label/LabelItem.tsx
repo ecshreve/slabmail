@@ -3,14 +3,12 @@ import theme from "../../styles/theme";
 import { Label } from "../../types/Label";
 interface LabelItemProps {
   label: Label;
-  onLabelClick: (labelId: string) => void;
 }
 
-export default function LabelItem({ label, onLabelClick }: LabelItemProps) {
+export default function LabelItem({ label }: LabelItemProps) {
   return (
     <ListItem
       component="button"
-      onClick={() => onLabelClick(label.id)}
       sx={{
         padding: '8px 12px',
         margin: '4px 0',

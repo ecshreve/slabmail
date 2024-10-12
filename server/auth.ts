@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import { Auth, google } from "googleapis";
 import path from "path";
 
-const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
+const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.modify"];
 const TOKEN_PATH = path.join(process.cwd(), "../config/token.json");
 const CREDENTIALS_PATH = path.join(process.cwd(), "../config/credentials.json");
 
@@ -16,6 +16,9 @@ export async function loadSavedCredentialsIfExist(): Promise<Auth.OAuth2Client |
   try {
     const content = await fs.readFile(TOKEN_PATH, "utf-8");
     const credentials = JSON.parse(content);
+    if (!credentials.refresh_token) {
+      return null;
+    }
     return google.auth.fromJSON(credentials) as Auth.OAuth2Client;
   } catch (err) {
     return null;
@@ -48,9 +51,11 @@ export async function saveCredentials(client: Auth.OAuth2Client): Promise<void> 
  */
 export async function authorize(): Promise<Auth.OAuth2Client> {
   let client = await loadSavedCredentialsIfExist();
-  if (client) {
+  if (client !== null) {
+    console.log("Loaded existing credentials");
     return client;
   }
+  console.log("No saved credentials found, requesting authorization...");
   client = (await authenticate({
     scopes: SCOPES,
     keyfilePath: CREDENTIALS_PATH,

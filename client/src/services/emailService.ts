@@ -39,3 +39,10 @@ export const fetchLabels = async (): Promise<Label[]> => {
   handleError(response);
   return response.json();
 };
+
+// Star an email
+export const updateStarredLabel = async (id: string, star: boolean): Promise<Email> => {
+  const response = await fetch(`${BASE_URL}/emails/${id}/star${star ? "?star=true" : ""}`, { method: "PATCH" });
+  handleError(response);
+  return response.json();
+};

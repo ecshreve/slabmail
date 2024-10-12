@@ -18,8 +18,15 @@ export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
   }
 
   // Ignore labels that start with "CATEGORY_"
-  const filteredLabels = labels.filter((label) => !label.name?.startsWith("CATEGORY_"));
-  console.log("Labels:", filteredLabels.length, "filtered out:", labels.length - filteredLabels.length);
+  const filteredLabels = labels.filter(
+    (label) => !label.name?.startsWith("CATEGORY_")
+  );
+  console.log(
+    "Labels:",
+    filteredLabels.length,
+    "filtered out:",
+    labels.length - filteredLabels.length
+  );
   return filteredLabels;
 }
 
@@ -30,7 +37,10 @@ export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
  * @param {string} id The ID of the label.
  * @returns {Promise<any>} The label details.
  */
-export async function fetchLabelDetails(auth: Auth.OAuth2Client, labels: gmail_v1.Schema$Label[]): Promise<any> {
+export async function fetchLabelDetails(
+  auth: Auth.OAuth2Client,
+  labels: gmail_v1.Schema$Label[]
+): Promise<any> {
   const gmail = google.gmail({ version: "v1", auth });
   const labelDetails = await Promise.all(
     labels.map(async (label) => {
@@ -44,8 +54,11 @@ export async function fetchLabelDetails(auth: Auth.OAuth2Client, labels: gmail_v
   return labelDetails;
 }
 
-export async function fetchLabelById(auth: Auth.OAuth2Client, id: string): Promise<any> {
-  const label = await fetchLabelDetails(auth, [{id}]);
+export async function fetchLabelById(
+  auth: Auth.OAuth2Client,
+  id: string
+): Promise<any> {
+  const label = await fetchLabelDetails(auth, [{ id }]);
   return label[0];
 }
 
@@ -99,7 +112,17 @@ export async function fetchMessageDetails(
             (header) => header.name === "From"
           )?.value,
           date: msg.data.internalDate,
-          body: msg.data.payload?.parts?.find((part) => part.mimeType === "text/plain")?.body?.data && Buffer.from(msg.data.payload.parts.find((part) => part.mimeType === "text/plain")!.body!.data!, 'base64').toString('utf-8'),
+          body:
+            msg.data.payload?.parts?.find(
+              (part) => part.mimeType === "text/plain"
+            )?.body?.data &&
+            Buffer.from(
+              msg.data.payload.parts.find(
+                (part) => part.mimeType === "text/plain"
+              )!.body!.data!,
+              "base64"
+            ).toString("utf-8"),
+          labelIds: msg.data.labelIds,
         };
       })
     );
@@ -112,7 +135,27 @@ export async function fetchMessageDetails(
   }
 }
 
-export async function fetchMessageById(auth: Auth.OAuth2Client, id: string): Promise<any> {
-  const messages = await fetchMessageDetails(auth, [{id}]);
+export async function fetchMessageById(
+  auth: Auth.OAuth2Client,
+  id: string
+): Promise<any> {
+  const messages = await fetchMessageDetails(auth, [{ id }]);
   return messages[0];
+}
+
+export async function toggleStarEmail(
+  auth: Auth.OAuth2Client,
+  id: string,
+  star: boolean
+): Promise<any> {
+  const gmail = google.gmail({ version: "v1", auth });
+  const res = await gmail.users.messages.modify({
+    userId: "me",
+    id: id,
+    requestBody: {
+      addLabelIds: star ? ["STARRED"] : [],
+      removeLabelIds: star ? [] : ["STARRED"],
+    },
+  });
+  return res.data;
 }

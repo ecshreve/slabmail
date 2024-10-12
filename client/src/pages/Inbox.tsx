@@ -6,7 +6,7 @@ import LabelList from '../components/label/LabelList';
 import ErrorComponent from '../components/shared/ErrorComponent';
 import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
-import { fetchEmails, fetchLabels } from '../services/emailService'; // API service
+import { fetchEmails, fetchLabels, updateStarredLabel } from '../services/emailService'; // API service
 import { Email } from '../types/Email';
 import { Label } from '../types/Label';
 
@@ -16,7 +16,6 @@ const Inbox: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null); // Track selected email
-  const [selectedLabel, setSelectedLabel] = useState<Label | null>(null); // Track selected label
 
   useEffect(() => {
     const getLabelsAndEmails = async () => {
@@ -35,18 +34,35 @@ const Inbox: React.FC = () => {
     getLabelsAndEmails();
   }, []); // Run once on mount
 
-  // Handle label click (when the user selects a label)
-  const handleLabelClick = (labelId: string) => {
-    const label = labels.find((l) => l.id === labelId); // Find the selected label by ID
-    if (label) {
-      setSelectedLabel(label); // Update the selected label
-    }
-  };
-
   const handleEmailClick = (emailId: string) => {
     const email = emails.find((e) => e.id === emailId); // Find the selected email by ID
     if (email) {
       setSelectedEmail(email);
+    }
+  };
+
+// Function to toggle the star status and update the backend
+const handleToggleStar = async (emailId: string) => {
+  try {
+    const email = emails.find((e) => e.id === emailId);
+    const isStarred = email?.labelIds.includes('STARRED');
+    const updatedEmail = await updateStarredLabel(emailId, !isStarred); // API call to update the backend
+
+    // Update the email list state to reflect the new star status
+    setEmails((prevEmails) =>
+      prevEmails.map((email) =>
+        email.id === emailId ? { ...email, labelIds: updatedEmail.labelIds } : email
+      )
+    );
+
+    setLabels((prevLabels) =>
+      prevLabels.map((label) =>
+        label.id === 'STARRED' ? { ...label, messagesTotal: label.messagesTotal + (isStarred ? -1 : 1) } : label
+      )
+    );
+  } catch (error) {
+    console.error('Failed to update star status:', error);
+    // Optionally handle error (e.g., rollback the UI change or show a message)
     }
   };
 
@@ -59,12 +75,12 @@ const Inbox: React.FC = () => {
       <Grid container display="flex" height="100vh" spacing={2}>
         {/* Left Column: Label List */}
         <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
-          <LabelList labels={labels} onLabelClick={handleLabelClick} />
+          <LabelList labels={labels} />
         </Grid>
 
         {/* Left Column: Email List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-          <EmailList emails={emails} onEmailClick={handleEmailClick} />
+          <EmailList emails={emails} onEmailClick={handleEmailClick} onToggleStar={handleToggleStar} />
         </Grid>
 
         {/* Right Column: Email Details */}

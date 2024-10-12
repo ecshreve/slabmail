@@ -1,6 +1,6 @@
 import express from "express";
 import { authorize } from "../auth";
-import { fetchLabelDetails, fetchLabels, fetchMessageById, fetchMessageDetails, listEmails } from "../services/gmailService";
+import { fetchLabelDetails, fetchLabels, fetchMessageById, fetchMessageDetails, listEmails, toggleStarEmail } from "../services/gmailService";
 
 const router = express.Router();
 
@@ -25,6 +25,19 @@ router.get("/emails/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching the email.");
+  }
+});
+
+router.patch("/emails/:id/star", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { star } = req.query
+    const auth = await authorize();
+    const result = await toggleStarEmail(auth, id, star !== undefined);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while starring the email.");
   }
 });
 
