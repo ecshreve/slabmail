@@ -4,7 +4,7 @@ import { Auth, gmail_v1, google } from "googleapis";
  * Lists the labels in the user's account.
  *
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
- * @returns {Promise<void>}
+ * @returns {Promise<any[]>} An array of label objects.
  */
 export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
   const gmail = google.gmail({ version: "v1", auth });
@@ -21,12 +21,7 @@ export async function fetchLabels(auth: Auth.OAuth2Client): Promise<any[]> {
   const filteredLabels = labels.filter(
     (label) => !label.name?.startsWith("CATEGORY_")
   );
-  console.log(
-    "Labels:",
-    filteredLabels.length,
-    "filtered out:",
-    labels.length - filteredLabels.length
-  );
+
   return filteredLabels;
 }
 
@@ -54,6 +49,13 @@ export async function fetchLabelDetails(
   return labelDetails;
 }
 
+/**
+ * Fetches a single label by ID.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the label.
+ * @returns {Promise<any>} The label details.
+ */
 export async function fetchLabelById(
   auth: Auth.OAuth2Client,
   id: string
@@ -80,7 +82,6 @@ export async function listEmails(auth: Auth.OAuth2Client): Promise<any[]> {
     return [];
   }
 
-  console.log("Messages: ", messages.length);
   return messages;
 }
 /**
@@ -127,8 +128,6 @@ export async function fetchMessageDetails(
         };
       })
     );
-
-    console.log("Messages: ", messageDetails.length);
     return messageDetails;
   } catch (error) {
     console.error("Error fetching message details:", error);
@@ -136,6 +135,13 @@ export async function fetchMessageDetails(
   }
 }
 
+/**
+ * Fetches a single message by ID.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the message.
+ * @returns {Promise<any>} The message details.
+ */
 export async function fetchMessageById(
   auth: Auth.OAuth2Client,
   id: string
@@ -144,6 +150,13 @@ export async function fetchMessageById(
   return messages[0];
 }
 
+/**
+ * Stars a message by ID.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the message.
+ * @returns {Promise<any>} The message details.
+ */
 export async function starMessage(auth: Auth.OAuth2Client, id: string): Promise<any> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.messages.modify({
@@ -156,7 +169,17 @@ export async function starMessage(auth: Auth.OAuth2Client, id: string): Promise<
   return res.data;
 }
 
-export async function unstarMessage(auth: Auth.OAuth2Client, id: string): Promise<any> {
+/**
+ * Unstars a message by ID.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the message.
+ * @returns {Promise<any>} The message details.
+ */
+export async function unstarMessage(
+  auth: Auth.OAuth2Client,
+  id: string
+): Promise<any> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.messages.modify({
     userId: "me",

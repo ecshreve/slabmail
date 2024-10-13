@@ -1,13 +1,19 @@
 // server.ts
+import { setupTracing } from './otel';
+setupTracing('email-service');
+
+import express, { Request, Response } from 'express';
+
 import cors from "cors";
-import express, { Request, Response } from "express";
-import emailRoutes from "./routes/emailRoutes";
 import rateLimit from "express-rate-limit";
+import emailRoutes from "./routes/emailRoutes";
+
 const app = express();
 const PORT = 3000;
 
-// Middleware
-//
+app.use(cors());
+app.set("trust proxy", 1);
+
 // Rate limiting
 app.use(
   rateLimit({
@@ -15,8 +21,6 @@ app.use(
     max: 100, // Limit each IP to 100 requests per windowMs
   })
 );
-
-app.use(cors());
 app.use("/api", emailRoutes);
 
 app.get("/", (req: Request, res: Response) => {
@@ -25,5 +29,4 @@ app.get("/", (req: Request, res: Response) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log(`Metrics available at http://localhost:9464/metrics`);
 });
