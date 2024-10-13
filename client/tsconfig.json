@@ -1,27 +1,11 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "esnext.asynciterable",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "outDir": "./dist",       // Output dir for compiled JS files
+    "lib": ["dom","esnext"],  // Use modern libraries
+    "jsx": "react-jsx"        // Use React JSX
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src/**/*"],      // Specify where TypeScript source files are located
+  "exclude": ["node_modules"]   // Exclude node_modules from being compiled
 }
+
