@@ -1,0 +1,15 @@
+[[task]]
+    id = "serve-dev"
+    type = "short"
+    cmd = "npx ts-node src/server.ts"
+
+[[task]]
+    id = "build"
+    type = "short"
+    cmd = "npx tsc"
+
+[[task]]
+    id = "serve-dist"
+    type = "short"
+    dependencies = ["build"]
+    cmd = "node dist/server.js"
