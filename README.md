@@ -1,6 +1,6 @@
 # slabmail
 
-![demo](config/images/ddemo.gif)
+![demo](images/demo.gif)
 
 ## Features
 - [x] Fetch emails from Gmail
@@ -104,4 +104,6 @@ A docker compose file for running supporting services (zipkin).
 
 Uses [OpenTelemetry](https://opentelemetry.io/) for tracing. The `server/src/otel.ts` file contains the setup for the tracer. The data is sent to a [zipkin](https://zipkin.io/) instance running on `localhost:9411`.
 
-![backend tracing](./config/images/zipkin.jpeg)
+![backend tracing](./images/zipkin.jpeg)
+
+![full trace](./images/zipkin2.jpeg)

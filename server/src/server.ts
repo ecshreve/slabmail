@@ -1,6 +1,7 @@
 // server.ts
-import { setupTracing } from './otel';
-setupTracing('email-service');
+// Commenting out the setupTracing import and function call as the module is not found
+import { initServerInstrumentation } from './otel';
+initServerInstrumentation();
 
 import express, { Request, Response } from 'express';
 

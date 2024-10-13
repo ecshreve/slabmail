@@ -4,8 +4,8 @@ import { Auth, google } from "googleapis";
 import path from "path";
 
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.modify"];
-const TOKEN_PATH = path.join(process.cwd(), "../config/token.json");
-const CREDENTIALS_PATH = path.join(process.cwd(), "../config/credentials.json");
+const TOKEN_PATH = path.join(process.cwd(), "config/token.json");
+const CREDENTIALS_PATH = path.join(process.cwd(), "config/credentials.json");
 
 /**
  * Reads previously authorized credentials from the save file.
