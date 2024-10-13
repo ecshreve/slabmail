@@ -1,4 +1,4 @@
-# tatemprep
+# slabmail
 
 ![demo](config/images/ddemo.gif)
 
@@ -8,16 +8,18 @@
 - [x] Display labels in a sidebar
 - [x] Display email content
 - [x] Star/unstar emails
+- [x] Backend tracing with zipkin
 - [ ] Search emails
 - [ ] Filter emails
 
-[!NOTE] This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
+> [!NOTE] 
+> This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
 
 ## Usage
 
 ### With `run`
 
-This project uses [run](https://github.com/amonks/run) to manage the dev environment. The `tasks.toml` file contains tasks for running the server and client separately, as well as running both in parallel in watch mode.
+This project uses [run](https://github.com/amonks/run) to manage the dev environment. The `tasks.toml` file contains tasks for running the dev environment.
 
 ```
 run dev
@@ -25,11 +27,17 @@ run dev
 
 ### Without `run`
 
+Run zipkin and set the `EXPORTER` environment variable to `zipkin` to enable tracing.
+```bash
+docker compose up -d zipkin
+export EXPORTER=zipkin
+```
+
 Run the server
 ```bash
 cd server
 npm install
-npx ts-node server.ts
+npx ts-node src/server.ts
 ```
 
 Run the client
@@ -51,11 +59,13 @@ The backend is a simple Node.js server that uses the Gmail API to fetch emails.
 
 ```bash
 /server
-├── /routes       # api routes
-├── /services     # api services
-├── auth.ts       # gmail api auth
-├── server.ts     # server entry point
-└── package.json
+├── /src
+│   ├── /routes       # api routes
+│   ├── /services     # api services
+│   ├── auth.ts       # gmail api auth
+│   ├── server.ts     # server entry point
+│   ├── otel.ts       # opentelemetry setup
+├── tasks.toml        # run tasks
 ```
 
 ### `/client`
@@ -83,3 +93,15 @@ The frontend is a React app that displays a list of emails fetched from the serv
 ### `/config`
 
 Miscellaneous configuration files, such as the Gmail API credentials which are gitignored.
+
+### `/docker-compose.yml`
+
+A docker compose file for running supporting services (zipkin).
+
+## Observability
+
+### Backend
+
+Uses [OpenTelemetry](https://opentelemetry.io/) for tracing. The `server/src/otel.ts` file contains the setup for the tracer. The data is sent to a [zipkin](https://zipkin.io/) instance running on `localhost:9411`.
+
+![backend tracing](./config/images/zipkin.jpeg)

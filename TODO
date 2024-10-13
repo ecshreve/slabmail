@@ -9,11 +9,11 @@ Features:
     ☐ Integrate ai agent to summarize and pre-sort emails
 
 Frontend:
+    ☐ Pagination, search, filters
     ✔ Directory layout @done(24-10-11 16:47)
     ✔ Three column Inbox layout @done(24-10-11 16:47)
-    ☐ Pagination, search, filters
-    ☐ Clean up styling
-    ☐ Type function parameters and helpers
+    ✔ Clean up styling @done(24-10-13 11:31)
+    ✔ Type function parameters and helpers @done(24-10-13 11:31)
 
     IndexedDB:
         ☐ Cache emails in IndexedDB
@@ -23,7 +23,9 @@ Frontend:
 Backend:
     ✔ Clean up gmail api auth @done(24-10-12 15:34)
     ✔ Organize directory structure @done(24-10-11 01:34)
+    ✔ Add tracing @done(24-10-13 11:02)
 
 Infra:
     ☐ Collect metrics and expose dashboard (Grafana/Prometheus/Loki)
+        ✔ tracing with zipkin @done(24-10-13 11:32)
     ☐ Dev mode to surface metrics in the app itself (e.g. cache hit rate, latency, errors, etc.)

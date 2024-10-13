@@ -1,8 +1,8 @@
 [[task]]
     id = "dev"
     type = "long"
-    env = { "APP_ENV" = "DEV" }
     dependencies = ["backend", "client"]
+    env = { APP_ENV = "DEV", CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Starting the dev server..."
         echo "APP_ENV: $APP_ENV"
@@ -10,23 +10,34 @@
 
 [[task]]
     id = "backend"
-    type = "short"
-    watch = ["server/**/*.ts"]
+    type = "long"
+    dependencies = ["zipkin"]
+    env = { EXPORTER = "zipkin", CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Running the backend..."
         cd server
         npm install
-        npx ts-node server.ts
+        npx ts-node src/server.ts
     """
 
 [[task]]
     id = "client"
     type = "short"
-    watch = ["client/src/**/*.tsx"]
-    env = { "PORT" = "3001" }
+    env = { PORT = "3001", EXPORTER = "zipkin", CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Running the client..."
         cd client
         npm install
         npm start
     """
+
+# These are for reference, usually the docker compose file is used instead
+[[task]]
+    id = "zipkin"
+    type = "short"
+    cmd = "docker compose up -d zipkin"
+
+[[task]]
+    id = "stop-zipkin"
+    type = "short"
+    cmd = "docker compose down zipkin"
