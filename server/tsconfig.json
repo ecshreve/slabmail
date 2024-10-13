@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "target": "ES2020",  // Use ES2020 or later to support modern JavaScript features
+    "module": "CommonJS",  // Use CommonJS for Node.js modules
+    "lib": ["ES2020"],     // Ensure you're using modern libraries
+    "moduleResolution": "node",  // Ensure Node.js module resolution
+    "outDir": "./dist",    // Output directory for compiled JS files
+    "rootDir": "./src",    // Root directory for TypeScript files
+    "esModuleInterop": true,  // Ensure compatibility with CommonJS and ES modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,  // Enable strict type-checking options
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],  // Specify where TypeScript source files are located
+  "exclude": ["node_modules"]  // Exclude node_modules from being compiled
 }
