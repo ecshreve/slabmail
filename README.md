@@ -9,6 +9,7 @@
 - [x] Display email content
 - [x] Star/unstar emails
 - [x] Backend tracing with zipkin
+- [x] Frontend tracing with zipkin
 - [ ] Search emails
 - [ ] Filter emails
 
@@ -27,10 +28,9 @@ run dev
 
 ### Without `run`
 
-Run zipkin and set the `EXPORTER` environment variable to `zipkin` to enable tracing.
+Run `zipkin` to enable tracing.
 ```bash
 docker compose up -d zipkin
-export EXPORTER=zipkin
 ```
 
 Run the server
@@ -86,13 +86,10 @@ The frontend is a React app that displays a list of emails fetched from the serv
 │   ├── /styles      # global styles
 │   ├── /types       # typescript types
 │   ├── /utils       # misc utilities
+│   ├── otel.ts      # opentelemetry setup
 │   └── App.tsx      # main app component
 └── package.json
 ```
-
-### `/config`
-
-Miscellaneous configuration files, such as the Gmail API credentials which are gitignored.
 
 ### `/docker-compose.yml`
 

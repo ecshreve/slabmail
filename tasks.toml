@@ -10,9 +10,9 @@
 
 [[task]]
     id = "backend"
-    type = "long"
+    type = "short"
     dependencies = ["zipkin"]
-    env = { EXPORTER = "zipkin", CLICOLOR_FORCE = "1" }
+    env = { CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Running the backend..."
         cd server
@@ -23,7 +23,8 @@
 [[task]]
     id = "client"
     type = "short"
-    env = { PORT = "3001", EXPORTER = "zipkin", CLICOLOR_FORCE = "1" }
+    dependencies = ["zipkin"]
+    env = { PORT = "3001", CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Running the client..."
         cd client
