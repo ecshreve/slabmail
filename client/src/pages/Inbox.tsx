@@ -8,51 +8,36 @@ import ErrorComponent from '../components/shared/ErrorComponent';
 import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { EmailContext } from '../contexts/EmailContext';
-import { LabelContext } from '../contexts/LabelContext';
-import { fetchEmails, fetchLabels, updateEmailStarred } from '../services/emailService';
+import { fetchEmails, updateEmailStarred } from '../services/emailService';
 import { Email } from '../types/Email';
-import { Label } from '../types/Label';
 
 const Inbox: React.FC = () => {
-  const { state: emailState, dispatch: emailDispatch } = useContext(EmailContext);
-  const { state: labelState, dispatch: labelDispatch } = useContext(LabelContext);
-  const { emails, loading: emailLoading, error: emailError } = emailState;
-  const { labels, loading: labelLoading, error: labelError } = labelState;
+  const { state, dispatch } = useContext(EmailContext);
+  const { emails, loading, error } = state;
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
+  const [selectedLabelId, setSelectedLabelId] = useState<string | null>('INBOX');
 
   // Fetch emails when the component mounts
   useEffect(() => {
     const fetchData = async () => {
-      emailDispatch({ type: 'FETCH_EMAILS_START' });
+      dispatch({ type: 'FETCH_EMAILS_START' });
       try {
         const fetchedEmails = await fetchEmails();
-        emailDispatch({ type: 'FETCH_EMAILS_SUCCESS', payload: fetchedEmails });
+        dispatch({ type: 'FETCH_EMAILS_SUCCESS', payload: fetchedEmails });
       } catch (error) {
-        emailDispatch({ type: 'FETCH_EMAILS_ERROR', payload: 'Failed to fetch emails' });
-      }
-
-      labelDispatch({ type: 'FETCH_LABELS_START' });
-      try {
-        const fetchedLabels = await fetchLabels();
-        labelDispatch({ type: 'FETCH_LABELS_SUCCESS', payload: fetchedLabels });
-      } catch (error) {
-        labelDispatch({ type: 'FETCH_LABELS_ERROR', payload: 'Failed to fetch labels' });
+        dispatch({ type: 'FETCH_EMAILS_ERROR', payload: 'Failed to fetch emails' });
       }
     };
     fetchData();
-  }, [emailDispatch, labelDispatch]);
+  }, [dispatch]);
+
 
   // Handle toggling the star and updating the label count
   const handleToggleStar = async (emailId: string, isStarred: boolean) => {
     try {
       await updateEmailStarred(emailId, isStarred);
-      emailDispatch({ type: 'TOGGLE_STAR', payload: { emailId, isStarred } });
-      labelDispatch({
-        type: 'UPDATE_LABEL_COUNT',
-        payload: { labelId: 'STARRED', delta: isStarred ? -1 : 1 },
-      });
+      dispatch({ type: 'TOGGLE_STAR', payload: { emailId, isStarred } });
     } catch (error) {
       console.error('Error toggling star status', error);
     }
@@ -61,17 +46,13 @@ const Inbox: React.FC = () => {
   const handleEmailSelect = (email: Email) => {
     setSelectedEmail(email); // Update the selected email state
   };
-  
-  const handleLabelSelect = (label: Label) => {
-    if (selectedLabel?.id === label.id) {
-      setSelectedLabel(null);
-    } else {
-      setSelectedLabel(label); // Update the selected label state
-    }
+
+  const handleLabelSelect = (labelId: string) => {
+    setSelectedLabelId(labelId);
   };
 
-  if (emailLoading || labelLoading) return <LoadingSpinner />;
-  if (emailError || labelError) return <ErrorComponent message={emailError || labelError || ''} />;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorComponent message={error || ''} />;
 
   return (
     <>
@@ -80,16 +61,14 @@ const Inbox: React.FC = () => {
         {/* Left Column: Label List */}
         <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
           <LabelList 
-            labels={labels} 
-            selectedLabel={selectedLabel} 
-            onSelectLabel={handleLabelSelect} 
+            onSelectLabel={(labelId) => handleLabelSelect(labelId)} 
           />
         </Grid>
         {/* Left Column: Email List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-          <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabel ? selectedLabel.name : 'All Emails'}</Typography>
+          <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabelId}</Typography>
           <EmailList 
-            emails={emails.filter(email => selectedLabel ? email.labelIds.includes(selectedLabel.id) : true)} 
+            emails={emails.filter(email => selectedLabelId ? email.labelIds.includes(selectedLabelId) : true)} 
             selectedEmail={selectedEmail}
             onSelectEmail={handleEmailSelect} 
             onToggleStar={handleToggleStar} 
@@ -99,7 +78,7 @@ const Inbox: React.FC = () => {
         <Grid size={7} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
           {selectedEmail && (
             <EmailDetails 
-              email={emails.find(e => e.id === selectedEmail.id) || selectedEmail} 
+              email={selectedEmail} 
               onToggleStar={handleToggleStar} 
             />
           )}

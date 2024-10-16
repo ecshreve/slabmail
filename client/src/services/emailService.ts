@@ -33,4 +33,25 @@ export const updateEmailStarred = async (id: string, starred: boolean): Promise<
   return response.json();
 };
 
-// 
+/**
+ * Fetch emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @returns The emails for the specified labels
+ */
+export const fetchEmailsByDefaultLabels = async (): Promise<Email[]> => {
+  const response = await fetch(`${BASE_URL}/emails/labels/default`);
+  handleError(response);
+  return response.json();
+};
+
+/**
+ * Fetch label by id
+ * 
+ * @param id The id of the label to fetch
+ * @returns The label with the specified id
+ */
+export const fetchLabelById = async (id: string): Promise<Label> => {
+  const response = await fetch(`${BASE_URL}/labels/${id}`);
+  handleError(response);
+  return response.json();
+};

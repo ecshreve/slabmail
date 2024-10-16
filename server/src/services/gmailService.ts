@@ -190,3 +190,24 @@ export async function unstarMessage(
   });
   return res.data;
 }
+
+/**
+ * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @returns {Promise<any[]>} An array of email objects.
+ */
+export async function fetchDefaultEmails(auth: Auth.OAuth2Client): Promise<any[]> {
+  const gmail = google.gmail({ version: "v1", auth });
+  const res = await gmail.users.messages.list({
+    userId: "me",
+    labelIds: ["INBOX", "UNREAD", "STARRED"],
+    maxResults: 100,
+  });
+  const messages = res.data.messages;
+  if (!messages || messages.length === 0) {
+    console.log("No messages found for default labels.");
+    return [];
+  }
+  return messages;
+}
