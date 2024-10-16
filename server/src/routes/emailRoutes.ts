@@ -1,6 +1,8 @@
 import express from "express";
 import { authorize } from "../auth";
 import {
+  fetchDefaultEmails,
+  fetchLabelById,
   fetchLabelDetails,
   fetchLabels,
   fetchMessageById,
@@ -89,4 +91,42 @@ router.get("/labels", async (req, res) => {
   }
 });
 
+/**
+ * Fetches a label by ID.
+ * 
+ * @route GET /labels/:id
+ * @returns {Object} A label object.
+ */
+router.get("/labels/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auth = await authorize();
+    const label = await fetchLabelById(auth, id);
+    res.status(200).json(label);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the label.");
+  }
+});
+
+
+/**
+ * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @route GET /emails/labels/default
+ * @returns {Array} An array of email objects.
+ */
+router.get("/emails/labels/default", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const emails = await fetchDefaultEmails(auth);
+    const messageDetails = await fetchMessageDetails(auth, emails);
+    res.status(200).json(messageDetails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching emails by default labels.");
+  }
+});
+
+    
 export default router;
