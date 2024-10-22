@@ -1,7 +1,18 @@
+################################################################################
+# Production tasks
+################################################################################
+# [[task]]
+#     id = "prod"
+#     type = "short"
+#     dependencies = ["server/serve"]
+
+################################################################################
+# Development tasks
+################################################################################
 [[task]]
     id = "dev"
     type = "long"
-    dependencies = ["backend", "client"]
+    dependencies = ["backend", "frontend"]
     env = { APP_ENV = "DEV", CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Starting the dev server..."
@@ -11,22 +22,20 @@
 [[task]]
     id = "backend"
     type = "short"
-    dependencies = ["zipkin"]
     env = { CLICOLOR_FORCE = "1" }
     cmd = """
         echo "Running the backend..."
         cd server
         npm install
-        npx ts-node src/server.ts
+        npm start
     """
 
 [[task]]
-    id = "client"
+    id = "frontend"
     type = "short"
-    dependencies = ["zipkin"]
     env = { PORT = "3001", CLICOLOR_FORCE = "1" }
     cmd = """
-        echo "Running the client..."
+        echo "Running the frontend..."
         cd client
         npm install
         npm start

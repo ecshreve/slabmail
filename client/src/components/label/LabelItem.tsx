@@ -1,5 +1,5 @@
 import { Box, ListItemText } from "@mui/material";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import theme from "../../styles/theme";
 
 interface LabelItemProps {
@@ -16,12 +16,13 @@ const fetchLabelCount = async (labelId: string) => {
 export default function LabelItem({ labelId, isSelected }: LabelItemProps) {
   // const [ highlight, setHighlight ] = useState(false);
 
-  const labelCount = useMemo(
-    () => {
-      return fetchLabelCount(labelId);
-    },
-    [labelId]
-  );
+  // TODO: revisit this, useMemo, useCallback? prop?
+  const [labelCount, setLabelCount] = useState(0);
+  useEffect(() => {
+    fetchLabelCount(labelId).then((count) => {
+      setLabelCount(count);
+    });
+  }, [labelId]);
 
   const highlight = isSelected;
   return (

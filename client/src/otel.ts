@@ -1,8 +1,8 @@
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web';
-import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { W3CTraceContextPropagator } from "@opentelemetry/core";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { Resource } from "@opentelemetry/resources";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";

@@ -13,36 +13,38 @@
 - [ ] Search emails
 - [ ] Filter emails
 
-> [!NOTE] 
-> This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
+
 
 ## Usage
 
+> [!NOTE]
+> This repository depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
+>
+> The instructions below also assume a running [`zipkin`](https://github.com/openzipkin/zipkin) instance listening on port `9411`.
+
+
 ### With `run`
 
-This project uses [run](https://github.com/amonks/run) to manage the dev environment. The `tasks.toml` file contains tasks for running the dev environment.
+This project uses [run](https://github.com/amonks/run) to manage the dev environment via tasks defined in the `tasks.toml` files. See the [notes](#installing-run) section for information on installing `run`.
 
+Start the application in dev mode with:
 ```
 run dev
 ```
 
 ### Without `run`
 
-Run `zipkin` to enable tracing.
-```bash
-docker compose up -d zipkin
-```
-
 Run the server
 ```bash
 cd server
 npm install
-npx ts-node src/server.ts
+npm start
 ```
 
 Run the client
 ```bash
 cd client
+export PORT=3001
 npm install
 npm start
 ```
@@ -59,13 +61,16 @@ The backend is a simple Node.js server that uses the Gmail API to fetch emails.
 
 ```bash
 /server
+├── /config           # storage for gmail api credentials
+├── /dist             # build output
 ├── /src
 │   ├── /routes       # api routes
 │   ├── /services     # api services
 │   ├── auth.ts       # gmail api auth
 │   ├── server.ts     # server entry point
 │   ├── otel.ts       # opentelemetry setup
-├── tasks.toml        # run tasks
+├── tasks.toml        # server specific run tasks
+└── package.json
 ```
 
 ### `/client`
@@ -104,3 +109,44 @@ Uses [OpenTelemetry](https://opentelemetry.io/) for tracing. The `server/src/ote
 ![backend tracing](./images/zipkin.jpeg)
 
 ![full trace](./images/zipkin2.jpeg)
+
+## Notes
+
+### Installing `run`
+
+To install `run` in the devcontainer after it has successfully built, follow these steps:
+
+1. Create a temporary directory for the installation:
+    ```bash
+    mkdir tmpinstall
+    cd tmpinstall
+    ```
+
+2. Download the appropriate release for your OS and architecture:
+    ```bash
+    wget https://github.com/amonks/run/releases/download/v1.0.0-beta.30/<RELEASE_FOR_YOUR_OS_AND_ARCH>.tar.gz
+    ```
+
+3. Extract the downloaded tarball:
+    ```bash
+    tar -xzf <RELEASE_FOR_YOUR_OS_AND_ARCH>.tar.gz
+    ```
+
+4. Move the `run` binary to a directory in your PATH:
+    ```bash
+    mv run ~/.local/bin/run
+    ```
+
+5. Clean up the temporary installation directory:
+    ```bash
+    cd ..
+    rm -rf tmpinstall
+    ```
+
+6. Verify the installation:
+    ```bash
+    which run
+    > ~/.local/bin/run
+    ```
+
+For more options and details, see the [run repository](https://github.com/amonks/run).

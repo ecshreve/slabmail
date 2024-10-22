@@ -1,31 +1,29 @@
+Offline First:
+    ☐ Dig into some offline strategies (https://web.dev/articles/offline-cookbook)
+    ☐ Think about sync strategies and how to handle conflicts
+    ☐ Add IndexedDB to cache emails locally (dexie)
+    ☐ Add an audit log of user actions 
+      - maybe need a log in browser as well as server
+    ☐ Detect when the user is offline and display an "offline" indicator
+      - think about ideal offline user experience
+
 General:
-    ✔ Move server code to a subdirectory @done(24-10-11 01:09)
-    ✔ Add taskfile @done(24-10-11 01:34)
-    ☐ Spin up devcontainer
-        - This wasn't playing nicely with gmail api auth, revisit
-
-Features:
-    ✔ Star/Unstar emails focus on state persistence and UI updates @done(24-10-12 15:34)
-    ☐ Integrate ai agent to summarize and pre-sort emails
-
-Frontend:
-    ☐ Pagination, search, filters
-    ✔ Directory layout @done(24-10-11 16:47)
-    ✔ Three column Inbox layout @done(24-10-11 16:47)
-    ✔ Clean up styling @done(24-10-13 11:31)
-    ✔ Type function parameters and helpers @done(24-10-13 11:31)
-
-    IndexedDB:
-        ☐ Cache emails in IndexedDB
-        ☐ Fetch from IndexedDB if available
-        ☐ Instrument to track cache hits/misses
-
-Backend:
-    ✔ Clean up gmail api auth @done(24-10-12 15:34)
-    ✔ Organize directory structure @done(24-10-11 01:34)
-    ✔ Add tracing @done(24-10-13 11:02)
-
-Infra:
+    ☐ Log external request counts and latency
     ☐ Collect metrics and expose dashboard (Grafana/Prometheus/Loki)
-        ✔ tracing with zipkin @done(24-10-13 11:32)
     ☐ Dev mode to surface metrics in the app itself (e.g. cache hit rate, latency, errors, etc.)
+
+Archive:
+  ✔ Move server code to a subdirectory @done(24-10-11 01:09) @project(General)
+  ✔ Add taskfile @done(24-10-11 01:34) @project(General)
+  ✔ Spin up devcontainer @done(24-10-22 05:05) @project(General)
+  ✔ Star/Unstar emails focus on state persistence and UI updates @done(24-10-12 15:34) @project(Features)
+  ✘ Integrate ai agent to summarize and pre-sort emails @cancelled(24-10-22 05:07) @project(Features)
+  ✘ Pagination, search, filters @cancelled(24-10-22 05:07) @project(Frontend)
+  ✔ Directory layout @done(24-10-11 16:47) @project(Frontend)
+  ✔ Three column Inbox layout @done(24-10-11 16:47) @project(Frontend)
+  ✔ Clean up styling @done(24-10-13 11:31) @project(Frontend)
+  ✔ Type function parameters and helpers @done(24-10-13 11:31) @project(Frontend)
+  ✔ Clean up gmail api auth @done(24-10-12 15:34) @project(Backend)
+  ✔ Organize directory structure @done(24-10-11 01:34) @project(Backend)
+  ✔ Add tracing @done(24-10-13 11:02) @project(Backend)
+  ✔ tracing with zipkin @done(24-10-13 11:32) @project(Infra)

@@ -59,7 +59,7 @@ const Inbox: React.FC = () => {
       <Header />  
       <Grid container display="flex" height="100vh" spacing={2}>
         {/* Left Column: Label List */}
-        <Grid size={2} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
+        <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
           <LabelList 
             onSelectLabel={(labelId) => handleLabelSelect(labelId)} 
           />
@@ -75,7 +75,7 @@ const Inbox: React.FC = () => {
           />
         </Grid>
         {/* Right Column: Email Details */}
-        <Grid size={7} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
+        <Grid size={6} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
           {selectedEmail && (
             <EmailDetails 
               email={selectedEmail} 
