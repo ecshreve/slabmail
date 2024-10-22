@@ -1,0 +1,27 @@
+{
+    "name": "slabmail-dev",
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        }
+    },
+    // "postCreateCommand": "",
+    "remoteUser": "node",
+    // "forwardPorts": [
+    //     8087
+    // ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "fabiospampinato.vscode-todo-plus",
+                "mutantdino.resourcemonitor",
+                "tamasfe.even-better-toml"
+            ]
+        }
+    }
+}
