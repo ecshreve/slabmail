@@ -7,19 +7,17 @@ import LabelList from '../components/label/LabelList';
 import ErrorComponent from '../components/shared/ErrorComponent';
 import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
-import { EmailContext } from '../contexts/EmailContext';
-import { fetchDefaultLabels, fetchEmails, updateEmailStarred } from '../services/emailService';
+import { EmailContext, EmailProvider } from '../contexts/EmailContext';
+import { fetchEmails, updateEmailStarred } from '../services/emailService';
 import { Email } from '../types/Email';
-import { Label } from '../types/Label';
 
 const Inbox: React.FC = () => {
   const { state, dispatch } = useContext(EmailContext);
   const { emails, loading, error } = state;
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [selectedLabelId, setSelectedLabelId] = useState<string | null>('INBOX');
-  const [labels, setLabels] = useState<Label[]>([]);
-  
+  const [selectedLabelId, setSelectedLabelId] = useState<string>('INBOX');
+
   // Fetch emails when the component mounts
   useEffect(() => {
     const fetchData = async () => {
@@ -33,15 +31,6 @@ const Inbox: React.FC = () => {
     };
     fetchData();
   }, [dispatch]);
-
-
-  useEffect(() => {
-    const fetchLabels = async () => {
-      const fetchedLabels = await fetchDefaultLabels();
-      setLabels(fetchedLabels);
-    };
-    fetchLabels();
-  }, []);
 
   // Handle toggling the star and updating the label count
   const handleToggleStar = async (emailId: string, isStarred: boolean) => {
@@ -66,34 +55,35 @@ const Inbox: React.FC = () => {
 
   return (
     <>
-      <Header />  
+      <Header />
       <Grid container display="flex" height="100vh" spacing={2}>
         {/* Left Column: Label List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
-          <LabelList 
-            labels={labels}
-            onSelectLabel={(labelId) => handleLabelSelect(labelId)} 
+          <LabelList
+            onSelectLabel={handleLabelSelect}
           />
         </Grid>
-        {/* Left Column: Email List */}
-        <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-          <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabelId}</Typography>
-          <EmailList 
-            emails={emails.filter(email => selectedLabelId ? email.labelIds.includes(selectedLabelId) : true)} 
-            selectedEmail={selectedEmail}
-            onSelectEmail={handleEmailSelect} 
-            onToggleStar={handleToggleStar} 
-          />
-        </Grid>
-        {/* Right Column: Email Details */}
-        <Grid size={6} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
-          {selectedEmail && (
-            <EmailDetails 
-              email={selectedEmail} 
-              onToggleStar={handleToggleStar} 
+        <EmailProvider>
+          {/* Left Column: Email List */}
+          <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
+            <Typography variant="h6" sx={{ padding: '16px' }}>{selectedLabelId}</Typography>
+            <EmailList
+              labelId={selectedLabelId}
+              onSelectEmail={handleEmailSelect}
+              onToggleStar={handleToggleStar}
             />
-          )}
-        </Grid>
+          </Grid>
+          {/* Right Column: Email Details */}
+          <Grid size={6} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
+            {selectedEmail && (
+              <EmailDetails
+                email={selectedEmail}
+                onToggleStar={handleToggleStar}
+              />
+            )}
+          </Grid>
+        </EmailProvider>
+
       </Grid>
     </>
   );

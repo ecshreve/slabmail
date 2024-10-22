@@ -1,37 +1,25 @@
-import { ListItemButton } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import theme from '../../styles/theme';
+import { ListItemButton, ListItemText } from '@mui/material';
+import { memo } from 'react';
+import { Label } from '../../types/Label';
+import './Label.css';
 interface LabelItemProps {
-  name: string;
-  count: number;      
+  item: Label;
   selected: boolean;
   onSelectLabel: () => void;
 }
 
-export default function LabelItem({ name, count, selected, onSelectLabel }: LabelItemProps) {
-
+const LabelItem: React.FC<LabelItemProps> = memo(({ item, selected, onSelectLabel }) => {
   return (
-    <ListItemButton
-      selected={selected}
-      onClick={onSelectLabel}
-      sx={{
-        display: 'flex',
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '8px 12px',
-        paddingRight: '20px',
-        margin: '4px 0',
-        borderRadius: '3px',
-        border: 'none',
-        '&.Mui-selected': {
-          paddingRight: '10px',
-          borderRight: `10px solid ${theme.palette.primary.main}`,
-        },
-      }}
+    <ListItemButton 
+      selected={selected} 
+      onClick={(event) => onSelectLabel()}
     >
-      <ListItemText primary={name} />
-      <ListItemText secondary={`(${count})`} sx={{ color: theme.palette.text.secondary, textAlign: 'right' }} />
+      <ListItemText primary={item.name} />
+      <ListItemText secondary={`(${item.messagesTotal})`} sx={{ textAlign: 'right' }} />
     </ListItemButton>
   );
-}
+}, (prevProps, nextProps) => {
+  return prevProps.item === nextProps.item && prevProps.selected === nextProps.selected;
+});
+
+export default LabelItem;

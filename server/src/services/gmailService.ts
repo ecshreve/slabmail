@@ -222,3 +222,20 @@ export async function fetchDefaultLabels(auth: Auth.OAuth2Client): Promise<any[]
   const labels = await fetchLabels(auth);
   return labels.filter(label => ['INBOX', 'STARRED', 'UNREAD'].includes(label.name));
 }
+
+/**
+ * Fetches emails for a specific label.
+ * 
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} id The ID of the label.
+ * @returns {Promise<any[]>} An array of email objects.
+ */
+export async function fetchEmailsByLabel(auth: Auth.OAuth2Client, id: string): Promise<any[]> {
+  const gmail = google.gmail({ version: "v1", auth });
+  const res = await gmail.users.messages.list({
+    userId: "me",
+    labelIds: [id],
+    maxResults: 100,
+  });
+  return res.data.messages || [];
+}

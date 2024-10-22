@@ -45,6 +45,18 @@ export const fetchEmailsByDefaultLabels = async (): Promise<Email[]> => {
 };
 
 /**
+ * Fetch emails by label id
+ * 
+ * @param id The id of the label to fetch emails for
+ * @returns The emails for the specified label
+ */
+export const fetchEmailsByLabelId = async (id: string): Promise<Email[]> => {
+  const response = await fetch(`${BASE_URL}/emails/labels/${id}`);
+  handleError(response);
+  return response.json();
+};
+
+/**
  * Fetch label by id
  * 
  * @param id The id of the label to fetch
