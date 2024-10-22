@@ -1,52 +1,37 @@
-import { Box, ListItemText } from "@mui/material";
-import { useEffect, useState } from "react";
-import theme from "../../styles/theme";
-
+import { ListItemButton } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
+import theme from '../../styles/theme';
 interface LabelItemProps {
-  labelId: string;
-  isSelected: boolean;
+  name: string;
+  count: number;      
+  selected: boolean;
+  onSelectLabel: () => void;
 }
 
-const fetchLabelCount = async (labelId: string) => {
-  const response = await fetch(`/api/labels/${labelId}`);
-  const data = await response.json();
-  return data.messagesTotal;
-}
+export default function LabelItem({ name, count, selected, onSelectLabel }: LabelItemProps) {
 
-export default function LabelItem({ labelId, isSelected }: LabelItemProps) {
-  // const [ highlight, setHighlight ] = useState(false);
-
-  // TODO: revisit this, useMemo, useCallback? prop?
-  const [labelCount, setLabelCount] = useState(0);
-  useEffect(() => {
-    fetchLabelCount(labelId).then((count) => {
-      setLabelCount(count);
-    });
-  }, [labelId]);
-
-  const highlight = isSelected;
   return (
-   
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        <ListItemText
-          primary={`${labelId}`} // Format as "LABEL_NAME: (COUNT)"
-        primaryTypographyProps={{
-          variant: 'body1', // Keep it simple and readable
-          noWrap: true,     // Prevent long labels from wrapping
-        }}
-      />
-        <ListItemText
-          className={highlight ? 'smooth-transition' : ''}
-          sx={{ 
-            textAlign: 'right', 
-          }}
-          secondary={`(${labelCount})`}
-          secondaryTypographyProps={{
-            variant: 'body2',
-            color: highlight ? theme.palette.primary.main : 'inherit',
-            fontWeight: highlight ? 'bolder' : 'normal'
-          }}
-        />
-      </Box>
+    <ListItemButton
+      selected={selected}
+      onClick={onSelectLabel}
+      sx={{
+        display: 'flex',
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '8px 12px',
+        paddingRight: '20px',
+        margin: '4px 0',
+        borderRadius: '3px',
+        border: 'none',
+        '&.Mui-selected': {
+          paddingRight: '10px',
+          borderRight: `10px solid ${theme.palette.primary.main}`,
+        },
+      }}
+    >
+      <ListItemText primary={name} />
+      <ListItemText secondary={`(${count})`} sx={{ color: theme.palette.text.secondary, textAlign: 'right' }} />
+    </ListItemButton>
   );
 }

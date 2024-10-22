@@ -55,3 +55,13 @@ export const fetchLabelById = async (id: string): Promise<Label> => {
   handleError(response);
   return response.json();
 };
+
+/**
+ * Fetch default labels
+ * 
+ * @returns The default labels
+ */
+export const fetchDefaultLabels = async (): Promise<Label[]> => {
+  const allLabels = await fetchLabels();
+  return allLabels.filter(label => ['INBOX', 'STARRED', 'UNREAD'].includes(label.id));
+};

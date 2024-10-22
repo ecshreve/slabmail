@@ -109,6 +109,23 @@ router.get("/labels/:id", async (req, res) => {
   }
 });
 
+/**
+ * Fetches details for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @route GET /labels/default
+ * @returns {Array} An array of label objects.
+ */
+router.get("/labels/default", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const labelIds = ['INBOX', 'STARRED', 'UNREAD'];
+    const labels = await Promise.all(labelIds.map(id => fetchLabelById(auth, id)));
+    res.status(200).json(labels);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the default labels.");
+  }
+});
 
 /**
  * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']

@@ -211,3 +211,14 @@ export async function fetchDefaultEmails(auth: Auth.OAuth2Client): Promise<any[]
   }
   return messages;
 }
+
+/**
+ * Fetches the details for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @returns {Promise<any[]>} An array of label objects.
+ */
+export async function fetchDefaultLabels(auth: Auth.OAuth2Client): Promise<any[]> {
+  const labels = await fetchLabels(auth);
+  return labels.filter(label => ['INBOX', 'STARRED', 'UNREAD'].includes(label.name));
+}

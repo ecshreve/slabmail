@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
 import LabelList from '../components/label/LabelList';
@@ -8,8 +8,9 @@ import ErrorComponent from '../components/shared/ErrorComponent';
 import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { EmailContext } from '../contexts/EmailContext';
-import { fetchEmails, updateEmailStarred } from '../services/emailService';
+import { fetchDefaultLabels, fetchEmails, updateEmailStarred } from '../services/emailService';
 import { Email } from '../types/Email';
+import { Label } from '../types/Label';
 
 const Inbox: React.FC = () => {
   const { state, dispatch } = useContext(EmailContext);
@@ -17,7 +18,8 @@ const Inbox: React.FC = () => {
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [selectedLabelId, setSelectedLabelId] = useState<string | null>('INBOX');
-
+  const [labels, setLabels] = useState<Label[]>([]);
+  
   // Fetch emails when the component mounts
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +35,14 @@ const Inbox: React.FC = () => {
   }, [dispatch]);
 
 
+  useEffect(() => {
+    const fetchLabels = async () => {
+      const fetchedLabels = await fetchDefaultLabels();
+      setLabels(fetchedLabels);
+    };
+    fetchLabels();
+  }, []);
+
   // Handle toggling the star and updating the label count
   const handleToggleStar = async (emailId: string, isStarred: boolean) => {
     try {
@@ -47,9 +57,9 @@ const Inbox: React.FC = () => {
     setSelectedEmail(email); // Update the selected email state
   };
 
-  const handleLabelSelect = (labelId: string) => {
+  const handleLabelSelect = useCallback((labelId: string) => {
     setSelectedLabelId(labelId);
-  };
+  }, []);
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorComponent message={error || ''} />;
@@ -61,6 +71,7 @@ const Inbox: React.FC = () => {
         {/* Left Column: Label List */}
         <Grid size={3} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto', padding: '16px' }}>
           <LabelList 
+            labels={labels}
             onSelectLabel={(labelId) => handleLabelSelect(labelId)} 
           />
         </Grid>
