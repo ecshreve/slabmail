@@ -1,36 +1,44 @@
 // /components/Email/EmailList.tsx
 import { List } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { fetchEmailsByLabelId } from '../../services/emailService';
-import { Email } from '../../types/Email';
+import React, { useCallback, useEffect, useState } from 'react';
+import { fetchMessagesByLabelId } from '../../services/emailService';
+import { Message } from '../../types/Email';
 import EmailItem from './EmailItem';
+
 interface EmailListProps {
   labelId: string;
-  onSelectEmail: (email: Email) => void;
+  onSelect: (messageId: string) => void;
   onToggleStar: (emailId: string, isStarred: boolean) => void;
 }
 
-const EmailList: React.FC<EmailListProps> = ({ labelId, onSelectEmail, onToggleStar }) => {
-  const [ emails, setEmails ] = useState<Email[]>([]);
-  const [ selectedEmail, setSelectedEmail ] = useState<Email | null>(null);
+const EmailList: React.FC<EmailListProps> = ({ labelId, onSelect, onToggleStar }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   useEffect(() => {
-    const fetchEmails = async () => {
-      const emails = await fetchEmailsByLabelId(labelId);
-      setEmails(emails);
+    const fetchData = async () => {
+      const msgs = await fetchMessagesByLabelId(labelId);
+      setMessages(msgs);
     };
-    fetchEmails();
+    fetchData();
   }, [labelId]);
+
+  const handleListItemClick = useCallback(
+    (item: Message, index: number) => {
+      setSelectedIndex(index);
+      onSelect(item.id);
+    },
+    [onSelect]
+  );
 
   return (
     <List sx={{ display: 'flex', flexDirection: 'column', padding: 0, borderRadius: '3px', gap: '10px', width: '100%' }} >
-      {emails.map((email) => (
+      {messages.map((msg, index) => (
         <EmailItem 
-          key={email.id} 
-          email={email} 
-          onSelectEmail={onSelectEmail}
-          onToggleStar={onToggleStar}
-          isSelected={selectedEmail?.id === email.id}
+          key={msg.id} 
+          email={msg} 
+          onSelect={() => handleListItemClick(msg, index)}
+          selected={selectedIndex === index}
         />
       ))}
     </List>

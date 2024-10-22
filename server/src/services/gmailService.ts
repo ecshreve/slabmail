@@ -105,14 +105,15 @@ export async function fetchMessageDetails(
         });
         return {
           id: msg.data.id,
-          snippet: msg.data.snippet,
+          threadId: msg.data.threadId,
+          labelIds: msg.data.labelIds,
+          timestamp: msg.data.internalDate,
           subject: msg.data.payload?.headers?.find(
             (header) => header.name === "Subject"
           )?.value,
           sender: msg.data.payload?.headers?.find(
             (header) => header.name === "From"
           )?.value,
-          date: msg.data.internalDate,
           body:
             msg.data.payload?.parts?.find(
               (part) => part.mimeType === "text/plain"
@@ -123,8 +124,6 @@ export async function fetchMessageDetails(
               )!.body!.data!,
               "base64"
             ).toString("utf-8"),
-          labelIds: msg.data.labelIds,
-          isStarred: msg.data.labelIds?.includes("STARRED"),
         };
       })
     );

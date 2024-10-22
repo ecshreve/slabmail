@@ -171,4 +171,42 @@ router.get("/emails/labels/:id", async (req, res) => {
   }
 });
 
+/**
+ * Fetches messages by label ID.
+ * 
+ * @route GET /messages/labels/:id
+ * @returns {Array} An array of message objects.
+ */
+router.get("/messages/labels/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auth = await authorize();
+    const messages = await fetchEmailsByLabel(auth, id);
+    const messageDetails = await fetchMessageDetails(auth, messages);
+    res.status(200).json(messageDetails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching messages by label.");
+  }
+});
+
+/**
+ * Fetches a message by ID.
+ * 
+ * @route GET /messages/:id
+ * @returns {Object} A message object.
+ */
+router.get("/messages/:id", async (req, res) => {
+
+  try {
+    const { id } = req.params;
+    const auth = await authorize();
+    const message = await fetchMessageById(auth, id);
+    res.status(200).json(message);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the message.");
+  }
+});
+
 export default router;
