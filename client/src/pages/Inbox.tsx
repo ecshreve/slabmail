@@ -8,7 +8,7 @@ import ErrorComponent from '../components/shared/ErrorComponent';
 import Header from '../components/shared/Header';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { EmailContext, EmailProvider } from '../contexts/EmailContext';
-import { fetchEmails, updateEmailStarred } from '../services/emailService';
+import { fetchEmails } from '../services/emailService';
 import { Email } from '../types/Email';
 
 const Inbox: React.FC = () => {
@@ -35,7 +35,7 @@ const Inbox: React.FC = () => {
   // Handle toggling the star and updating the label count
   const handleToggleStar = async (emailId: string, isStarred: boolean) => {
     try {
-      await updateEmailStarred(emailId, isStarred);
+      console.log('Toggling star for email', emailId, isStarred);
       dispatch({ type: 'TOGGLE_STAR', payload: { emailId, isStarred } });
     } catch (error) {
       console.error('Error toggling star status', error);

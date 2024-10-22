@@ -1,10 +1,11 @@
 // /components/LabelList.tsx
 import { List } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
-import { fetchDefaultLabels } from '../../services/emailService';
 import { Label } from '../../types/Label';
 import './Label.css';
 import LabelItem from './LabelItem';
+import { fetchLabels } from '../../services/emailService';
+
 interface LabelListProps {
   onSelectLabel: (labelId: string) => void;
 }
@@ -14,11 +15,11 @@ const LabelList: React.FC<LabelListProps> = ({ onSelectLabel }) => {
   const [items, setItems] = useState<Label[]>([]);
   
   useEffect(() => {
-    const fetchLabels = async () => {
-      const fetchedLabels = await fetchDefaultLabels();
+    const fetchData = async () => {
+      const fetchedLabels = await fetchLabels();
       setItems(fetchedLabels);
     };
-    fetchLabels();
+    fetchData();
   }, []);
 
   const handleListItemClick = useCallback(

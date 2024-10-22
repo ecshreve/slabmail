@@ -102,8 +102,14 @@ router.get("/labels/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const auth = await authorize();
-    const label = await fetchLabelById(auth, id);
-    res.status(200).json(label);
+    if (id === 'default') {
+      const labelIds = ['INBOX', 'STARRED', 'UNREAD'];
+      const labelData = await Promise.all(labelIds.map(id => fetchLabelById(auth, id)));
+      res.status(200).json(labelData);
+    } else {
+      const label = await fetchLabelById(auth, id);
+      res.status(200).json(label);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching the label.");
