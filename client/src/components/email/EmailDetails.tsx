@@ -4,16 +4,16 @@ import { Star, StarOutline } from '@mui/icons-material';
 import {
   Box,
   Button,
-  CircularProgress,
   Divider,
   IconButton,
   Paper,
-  Typography,
+  Typography
 } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { EmailContext } from '../../contexts/EmailContext';
 import { Email } from '../../types/Email';
 import { formatDate, formatEmailAddress } from '../../utils/helpers';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
 interface EmailDetailProps {
   emailId: string | null;
@@ -45,7 +45,7 @@ const EmailDetail: React.FC<EmailDetailProps> = ({ emailId }) => {
   if (isLoading) {
     return (
       <Box flex={2} p={2} display="flex" alignItems="center" justifyContent="center">
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }
