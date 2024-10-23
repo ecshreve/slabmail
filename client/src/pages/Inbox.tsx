@@ -6,7 +6,7 @@ import Header from '../components/shared/Header';
 import { Email } from '../types/Email';
 
 const Inbox: React.FC = () => {
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 
   return (
     <>
@@ -14,14 +14,13 @@ const Inbox: React.FC = () => {
       <Grid container display="flex" height="100vh" spacing={2}>
         {/* Left Column: Email List */}
         <Grid size={4} sx={{ borderRight: '1px solid #e0e0e0', height: '100vh', overflowY: 'auto' }}>
-          <EmailList />
+          <EmailList onSelectEmail={setSelectedEmailId} />
         </Grid>
         {/* Right Column: Email Details */}
         <Grid size={8} sx={{ padding: '16px', height: '100vh', overflowY: 'auto' }}>
-          {selectedEmail && (
+          {selectedEmailId && (
             <EmailDetails 
-              email={selectedEmail} 
-              onToggleStar={() => {}} 
+              emailId={selectedEmailId} 
             />
           )}
         </Grid>
