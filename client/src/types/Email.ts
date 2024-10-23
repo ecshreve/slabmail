@@ -5,5 +5,7 @@ export interface Email {
   sender: string;
   date: string;
   labelIds: string[];
-  isStarred: boolean;
+  starred: boolean;
 }
+
+export const STARRED_LABEL_ID = 'STARRED';

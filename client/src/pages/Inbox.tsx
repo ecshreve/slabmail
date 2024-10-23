@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
 import Header from '../components/shared/Header';
-import { Email } from '../types/Email';
 
 const Inbox: React.FC = () => {
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);

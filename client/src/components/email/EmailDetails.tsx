@@ -1,16 +1,26 @@
 // src/components/EmailDetail.tsx
 
+import { Star, StarOutline } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Paper,
+  Typography,
+} from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { EmailContext } from '../../contexts/EmailContext';
 import { Email } from '../../types/Email';
-import { formatDate } from '../../utils/helpers';
+import { formatDate, formatEmailAddress } from '../../utils/helpers';
 
 interface EmailDetailProps {
   emailId: string | null;
 }
 
 const EmailDetail: React.FC<EmailDetailProps> = ({ emailId }) => {
-  const { emails } = useContext(EmailContext);
+  const { emails, toggleStarred } = useContext(EmailContext);
   const [email, setEmail] = useState<Email | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -22,47 +32,81 @@ const EmailDetail: React.FC<EmailDetailProps> = ({ emailId }) => {
       setIsLoading(false);
     } else {
       setEmail(null);
+      setIsLoading(false);
     }
-  }, [emailId, emails])
+  }, [emailId, emails]);
 
   const handleDelete = () => {
     if (email) {
-      //deleteEmail(email.id);
       setEmail(null);
     }
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Box flex={2} p={2} display="flex" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (!email) {
     return (
-      <div style={{ flex: '2', padding: '20px' }}>
-        <p>Select an email to view its details.</p>
-      </div>
+      <Box flex={2} p={2}>
+        <Typography variant="h6" color="textSecondary">
+          Select an email to view its details.
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div style={{ flex: '2', padding: '20px', overflowY: 'auto' }}>
-      <h2>{email.subject}</h2>
-      <p>
-        <strong>From:</strong> {email.sender}
-      </p>
-      <p>
-        <strong>Date:</strong> {formatDate(email.date)}
-      </p>
-      <div style={{ marginTop: '20px' }}>
-        <button onClick={() => /* Implement Reply */ {}}>Reply</button>
-        <button onClick={() => /* Implement Forward */ {}}>Forward</button>
-        <button onClick={handleDelete}>Delete</button>
-      </div>
-      <hr />
-      <div>
-        <p>{email.body}</p>
-      </div>
-    </div>
+    <Box flex={2} p={2} overflow="auto">
+      <Box display="flex" flexDirection="row" width="100%" justifyContent="space-between">
+        <Typography variant="h5" gutterBottom>
+          {email.subject}
+        </Typography>
+        <IconButton
+                  edge="end"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents triggering the email selection
+                    toggleStarred(email.id);
+                  }}
+                >
+                  {email.starred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
+                </IconButton>
+      </Box>
+      <Typography variant="subtitle1" color="textSecondary">
+        From: {formatEmailAddress(email.sender)}
+      </Typography>
+      <Typography variant="subtitle2" color="textSecondary">
+        Date: {formatDate(email.date)}
+      </Typography>
+
+      <Box mt={3} display="flex" gap={2}>
+        <Button variant="contained" color="primary" onClick={() => {/* Implement Reply */}}>
+          Reply
+        </Button>
+        <Button variant="outlined" color="primary" onClick={() => {/* Implement Forward */}}>
+          Forward
+        </Button>
+        <Button variant="text" color="error" onClick={handleDelete}>
+          Delete
+        </Button>
+      </Box>
+      <Divider sx={{ my: 2 }} />
+      <Paper elevation={1} sx={{ p: 2, overflow: 'auto' }}>  
+        <Box>
+          <Typography variant="body1" component="div">
+            {email.body.split('\n').map((line, index) => (
+              <Typography key={index} component="div">
+                {line}
+              </Typography>
+            ))}
+          </Typography>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 

@@ -8,8 +8,7 @@ import {
   fetchMessageById,
   fetchMessageDetails,
   listEmails,
-  starMessage,
-  unstarMessage
+  starMessage
 } from "../services/gmailService";
 
 const router = express.Router();
@@ -47,29 +46,6 @@ router.get("/emails/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching the email.");
-  }
-});
-
-/**
- * Stars or unstars an email by ID.
- * 
- * @route GET /emails/:id/star
- * @returns {Object} A success status.
- */
-router.get("/emails/:id/star", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { starred } = req.query;
-    const auth = await authorize();
-    if (starred === 'true') {
-      await unstarMessage(auth, id);
-    } else {
-      await starMessage(auth, id);
-    }
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
   }
 });
 
@@ -128,5 +104,22 @@ router.get("/emails/labels/default", async (req, res) => {
   }
 });
 
-    
+/**
+ * Updates the starred status of an email by ID.
+ * 
+ * @route PUT /emails/:id/star
+ * @returns {Object} A success status.
+ */
+router.put("/emails/:id/star/:setStarred", async (req, res) => {
+  try {
+    const { id, setStarred } = req.params;
+    const auth = await authorize();
+    await starMessage(auth, id, setStarred === 'true');
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
+  }
+});
+
 export default router;

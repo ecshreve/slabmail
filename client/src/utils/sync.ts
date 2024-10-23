@@ -1,7 +1,7 @@
 // src/utils/sync.ts
 
-import { Email } from '../types/Email';
-import { saveEmails } from './db';
+import { Email, STARRED_LABEL_ID } from '../types/Email';
+import { getEmails, saveEmails } from './db';
 
 export const syncEmails = async () => {
   try {
@@ -12,4 +12,10 @@ export const syncEmails = async () => {
   } catch (error) {
     console.error('Failed to sync emails:', error);
   }
+};
+
+export const syncStarredEmails = async () => {
+  const emails = await getEmails();
+  const starredEmails = emails.filter((email: Email) => email.labelIds.includes(STARRED_LABEL_ID));
+  await saveEmails(starredEmails);
 };
