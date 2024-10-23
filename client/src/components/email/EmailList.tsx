@@ -1,29 +1,21 @@
-// /components/Email/EmailList.tsx
-import { List } from '@mui/material';
-import React from 'react';
-import { Email } from '../../types/Email';
-import EmailItem from './EmailItem';
+// src/components/EmailList.tsx
 
-interface EmailListProps {
-  emails: Email[];
-  selectedEmail: Email | null;
-  onSelectEmail: (email: Email) => void;
-  onToggleStar: (emailId: string, isStarred: boolean) => void;
-}
+import React, { useContext } from 'react';
+import { EmailContext } from '../../contexts/EmailContext';
 
-const EmailList: React.FC<EmailListProps> = ({ emails, selectedEmail, onSelectEmail, onToggleStar }) => {  
+const EmailList: React.FC = () => {
+  const { emails } = useContext(EmailContext);
+
   return (
-    <List sx={{ display: 'flex', flexDirection: 'column', padding: 0, borderRadius: '3px', gap: '10px', width: '100%' }} >
+    <div>
       {emails.map((email) => (
-        <EmailItem 
-          key={email.id} 
-          email={email} 
-          onSelectEmail={onSelectEmail}
-          onToggleStar={onToggleStar}
-          isSelected={selectedEmail?.id === email.id}
-        />
+        <div key={email.id}>
+          <h3>{email.subject}</h3>
+          <p>From: {email.sender}</p>
+          {/* Link to EmailDetail component */}
+        </div>
       ))}
-    </List>
+    </div>
   );
 };
 

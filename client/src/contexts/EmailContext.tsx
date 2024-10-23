@@ -1,28 +1,32 @@
-// /contexts/EmailContext.tsx
-import React, { createContext, ReactNode, useReducer } from 'react';
-import { EmailAction, emailReducer, EmailState } from '../reducers/emailReducer';
+// src/context/EmailContext.tsx
 
-interface EmailContextType {
-  state: EmailState;
-  dispatch: React.Dispatch<EmailAction>;
+import React, { createContext, useEffect, useState } from 'react';
+import { Email } from '../types/Email';
+import { getEmails } from '../utils/db';
+
+interface EmailContextProps {
+  emails: Email[];
+  setEmails: React.Dispatch<React.SetStateAction<Email[]>>;
 }
 
-const initialState: EmailState = {
+export const EmailContext = createContext<EmailContextProps>({
   emails: [],
-  loading: false,
-  error: null,
-};
-
-export const EmailContext = createContext<EmailContextType>({
-  state: initialState,
-  dispatch: () => null,
+  setEmails: () => {},
 });
 
-export const EmailProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(emailReducer, initialState);
+export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [emails, setEmails] = useState<Email[]>([]);
+
+  useEffect(() => {
+    const loadEmails = async () => {
+      const storedEmails = await getEmails();
+      setEmails(storedEmails);
+    };
+    loadEmails();
+  }, []);
 
   return (
-    <EmailContext.Provider value={{ state, dispatch }}>
+    <EmailContext.Provider value={{ emails, setEmails }}>
       {children}
     </EmailContext.Provider>
   );
