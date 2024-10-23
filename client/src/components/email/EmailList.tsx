@@ -4,7 +4,7 @@ import {
   Box,
   List
 } from '@mui/material';
-import React, { ChangeEvent, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, useContext, useMemo, useState } from 'react';
 import { EmailContext } from '../../contexts/EmailContext';
 import CustomPagination from '../shared/CustomPagination';
 import EmailListItem from './EmailListItem';
@@ -20,27 +20,15 @@ const EmailList: React.FC<EmailListProps> = ({ currentPage, selectedEmailPage, s
   const { emails, toggleStarred } = useContext(EmailContext);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterStarred, setFilterStarred] = useState<boolean>(false);
-  const emailsPerPage = 7;
+  const [indexRange, setIndexRange] = useState<{ start: number, end: number }>({ start: 0, end: 7 });
 
-  // Filter emails based on filterStarred
   const filteredEmails = useMemo(() => {
     return filterStarred ? emails.filter((email) => email.starred) : emails;
   }, [emails, filterStarred]);
 
-  const totalPages = useMemo(() => Math.ceil(filteredEmails.length / emailsPerPage), [filteredEmails.length, emailsPerPage]);
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages || 1);
-    }
-  }, [filteredEmails.length, currentPage, totalPages, setCurrentPage]);
-
-  const indexOfLastEmail = currentPage * emailsPerPage;
-  const indexOfFirstEmail = indexOfLastEmail - emailsPerPage;
-
   const currentEmails = useMemo(() => {
-    return filteredEmails.slice(indexOfFirstEmail, indexOfLastEmail);
-  }, [filteredEmails, indexOfFirstEmail, indexOfLastEmail]);
+    return filteredEmails.slice(indexRange.start, indexRange.end);
+  }, [filteredEmails, indexRange]);
 
   const handleEmailClick = (id: string) => {
     setSelectedId(id);
@@ -49,26 +37,26 @@ const EmailList: React.FC<EmailListProps> = ({ currentPage, selectedEmailPage, s
 
   const handlePageChange = (event: ChangeEvent<unknown> | null, value: number) => {
     setCurrentPage(value);
-  };
-
-  const firstEmailNumber = indexOfFirstEmail + 1;
-  const lastEmailNumber = Math.min(indexOfLastEmail, filteredEmails.length);
-
+    setIndexRange({ start: (value - 1) * 7, end: value * 7 });
+  }
   return (
-    <Box flex={1} overflow="auto" borderRight="1px solid #ccc" display="flex" flexDirection="column">
-      <Box display="flex" flexDirection="row" justifyContent="space-between" p={2}>
-        <CustomPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalEmails={filteredEmails.length}
-          firstEmailNumber={firstEmailNumber}
-          lastEmailNumber={lastEmailNumber}
-          filterStarred={filterStarred}
-          setFilterStarred={setFilterStarred}
-          onChange={handlePageChange}
-          selectedEmailPage={selectedEmailPage} 
-        />
-      </Box>
+    <Box 
+      sx={{
+        width: '400px',
+        borderRight: '1px solid #ccc', 
+        display: 'flex', 
+        flexDirection: 'column' 
+      }}
+    >
+      <CustomPagination
+        currentPage={currentPage}
+        totalEmails={filteredEmails.length}
+        filterStarred={filterStarred}
+        setFilterStarred={setFilterStarred}
+        onChange={handlePageChange}
+        selectedEmailPage={selectedEmailPage}
+      />
+
       <List disablePadding>
         {currentEmails.map((email) => (
           <EmailListItem

@@ -10,56 +10,75 @@ import {
     Pagination,
     PaginationItem,
     Paper,
-    Tooltip,
-    Typography,
+    Tooltip
 } from '@mui/material';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect, useMemo } from 'react';
 
 interface CustomPaginationProps {
-    totalEmails: number;
-    totalPages: number;
+    // Pagination Data
     currentPage: number;
-    firstEmailNumber: number;
-    lastEmailNumber: number;
+    selectedEmailPage: number | null;
+
+    // Email Data
+    totalEmails: number;
+
+    // Filter Controls
     filterStarred: boolean;
     setFilterStarred: (filterStarred: boolean) => void;
+
+    // Event Handlers
     onChange: (event: ChangeEvent<unknown> | null, page: number) => void;
-    selectedEmailPage: number | null;
 }
 
-const CustomPagination: React.FC<CustomPaginationProps> = ({ 
-        totalPages, 
-    currentPage, 
-    firstEmailNumber, 
-    lastEmailNumber, 
-    totalEmails, 
-    filterStarred, 
-    setFilterStarred, 
-    onChange,
-    selectedEmailPage
-}) => {
-    const handlePrev = () => {
-        if (currentPage > 1) {
-            onChange(null, currentPage - 1);
-        }
-    };
+const CustomPagination: React.FC<CustomPaginationProps> = ({
+    // Pagination Data
+    currentPage,
+    selectedEmailPage,
 
-    const handleNext = () => {
-        if (currentPage < totalPages) {
-            onChange(null, currentPage + 1);
+    // Email Data
+    totalEmails,
+
+    // Filter Controls
+    filterStarred,
+    setFilterStarred,
+
+    // Event Handlers
+    onChange,
+}) => {
+    const emailsPerPage = 7;
+    const totalPages = useMemo(() => Math.ceil(totalEmails / emailsPerPage), [totalEmails, emailsPerPage]);
+    const indexOfLastEmail = currentPage * emailsPerPage;
+    const indexOfFirstEmail = indexOfLastEmail - emailsPerPage;
+    const firstEmailNumber = indexOfFirstEmail + 1;
+    const lastEmailNumber = Math.min(indexOfLastEmail, totalEmails);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            onChange(null, totalPages || 1);
         }
-    };
+    }, [currentPage, totalPages, onChange]);
+
+        // Handlers for pagination navigation
+    const handlePrev = () => currentPage > 1 && onChange(null, currentPage - 1);
+    const handleNext = () => currentPage < totalPages && onChange(null, currentPage + 1);
+
+    // Render custom pagination items
+    const renderPaginationItem = (item: any) => (
+        <>
+            <PaginationItem {...item} />
+            {selectedEmailPage !== currentPage && item.page === selectedEmailPage && <Divider />}
+        </>
+    );
 
     return (
-        <Paper elevation={1} sx={{ width: '100%', padding: 0 }} >
-            <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="nowrap" width="100%">
+        <Paper elevation={1} sx={{ padding: '0px' }} >
+            <Box display="flex" alignItems="center" flexWrap="nowrap" justifyContent="space-between" width="100%">
+                {/* Pagination Controls */}
                 <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="nowrap" width="100%">
-                    {/* Prev Arrow */}
                     <IconButton onClick={handlePrev} disabled={currentPage === 1}>
                         <ArrowBackIcon />
                     </IconButton>
 
-                    {/* Page Numbers */}
                     <Pagination
                         count={totalPages}
                         page={currentPage}
@@ -70,26 +89,20 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
                         hidePrevButton
                         hideNextButton
                         size="small"
-                        renderItem={(item) => (
-                            <>
-                                <PaginationItem
-                                    {...item}
-                                />
-                                {selectedEmailPage !== currentPage && item.page === selectedEmailPage && <Divider />}
-                            </>
-                        )}
+                        renderItem={renderPaginationItem}
                     />
 
-                    {/* Next Arrow */}
                     <IconButton onClick={handleNext} disabled={currentPage === totalPages}>
                         <ArrowForwardIcon />
                     </IconButton>
-                    <Typography variant="body2">
+
+                    {/* <Typography variant="body2">
                         {firstEmailNumber}-{lastEmailNumber} of {totalEmails}
-                    </Typography>
+                    </Typography> */}
                 </Box>
-                <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
-                    {/* Starred Emails Filter */}
+
+                {/* Starred Emails Filter */}
+                <Box display="flex" alignItems="center" p={2}>
                     <Tooltip title={filterStarred ? 'Show All Emails' : 'Show Starred Emails'}>
                         <IconButton onClick={() => setFilterStarred(!filterStarred)}>
                             {filterStarred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
@@ -97,7 +110,7 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
                     </Tooltip>
                 </Box>
             </Box>
-        </Paper >
+        </Paper>
     );
 };
 
