@@ -1,24 +1,14 @@
 // src/utils/db.ts
-import { DBSchema, openDB } from 'idb';
+import { openDB } from 'idb';
 import { Email } from '../types/Email';
 
 const DB_NAME = 'slabmail-client-db';
 const STORE_NAME = 'emails';
 
-interface EmailDB extends DBSchema {
-  emails: {
-    key: string;
-    value: Email;
-    indexes: {
-      'by-starred': string;
-    };
-  };
-}
-
-export const dbPromise = openDB<EmailDB>(DB_NAME, 1, {
+export const dbPromise = openDB(DB_NAME, 1, {
   upgrade(db) {
-    db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-  }
+    db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+  },
 });
 
 export const getEmails = async () => {

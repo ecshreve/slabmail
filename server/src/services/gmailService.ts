@@ -123,8 +123,7 @@ export async function fetchMessageDetails(
               )!.body!.data!,
               "base64"
             ).toString("utf-8"),
-          labelIds: msg.data.labelIds,
-          starred: msg.data.labelIds?.includes("STARRED") ? 'true' : 'false',
+            starred: msg.data.labelIds?.includes("STARRED") ? true : false,
         };
       })
     );

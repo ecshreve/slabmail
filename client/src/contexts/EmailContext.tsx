@@ -29,9 +29,6 @@ export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const updatedEmail = {
       ...emails[emailIndex],
-      labelIds: emails[emailIndex].labelIds.includes('STARRED') 
-        ? emails[emailIndex].labelIds.filter(label => label !== 'STARRED') 
-        : [...emails[emailIndex].labelIds, 'STARRED'],
       starred: !emails[emailIndex].starred,
     };
 
