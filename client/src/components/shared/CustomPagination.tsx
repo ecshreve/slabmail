@@ -5,8 +5,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
     Box,
+    Divider,
     IconButton,
     Pagination,
+    PaginationItem,
     Paper,
     Tooltip,
     Typography,
@@ -22,9 +24,20 @@ interface CustomPaginationProps {
     filterStarred: boolean;
     setFilterStarred: (filterStarred: boolean) => void;
     onChange: (event: ChangeEvent<unknown> | null, page: number) => void;
+    selectedEmailPage: number | null;
 }
 
-const CustomPagination: React.FC<CustomPaginationProps> = ({ totalPages, currentPage, firstEmailNumber, lastEmailNumber, totalEmails, filterStarred, setFilterStarred, onChange }) => {
+const CustomPagination: React.FC<CustomPaginationProps> = ({ 
+        totalPages, 
+    currentPage, 
+    firstEmailNumber, 
+    lastEmailNumber, 
+    totalEmails, 
+    filterStarred, 
+    setFilterStarred, 
+    onChange,
+    selectedEmailPage
+}) => {
     const handlePrev = () => {
         if (currentPage > 1) {
             onChange(null, currentPage - 1);
@@ -57,6 +70,14 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({ totalPages, current
                         hidePrevButton
                         hideNextButton
                         size="small"
+                        renderItem={(item) => (
+                            <>
+                                <PaginationItem
+                                    {...item}
+                                />
+                                {selectedEmailPage !== currentPage && item.page === selectedEmailPage && <Divider />}
+                            </>
+                        )}
                     />
 
                     {/* Next Arrow */}

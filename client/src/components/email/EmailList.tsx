@@ -2,8 +2,7 @@
 
 import {
   Box,
-  List,
-  SelectChangeEvent
+  List
 } from '@mui/material';
 import React, { ChangeEvent, useContext, useEffect, useMemo, useState } from 'react';
 import { EmailContext } from '../../contexts/EmailContext';
@@ -11,15 +10,17 @@ import CustomPagination from '../shared/CustomPagination';
 import EmailListItem from './EmailListItem';
 
 interface EmailListProps {
+  currentPage: number;
+  selectedEmailPage: number | null;
+  setCurrentPage: (page: number) => void;
   onSelectEmail: (id: string) => void;
 }
 
-const EmailList: React.FC<EmailListProps> = ({ onSelectEmail }) => {
+const EmailList: React.FC<EmailListProps> = ({ currentPage, selectedEmailPage, setCurrentPage, onSelectEmail }) => {
   const { emails, toggleStarred } = useContext(EmailContext);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [emailsPerPage, setEmailsPerPage] = useState(7);
   const [filterStarred, setFilterStarred] = useState<boolean>(false);
+  const emailsPerPage = 7;
 
   // Filter emails based on filterStarred
   const filteredEmails = useMemo(() => {
@@ -32,7 +33,7 @@ const EmailList: React.FC<EmailListProps> = ({ onSelectEmail }) => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages || 1);
     }
-  }, [filteredEmails.length, currentPage, totalPages]);
+  }, [filteredEmails.length, currentPage, totalPages, setCurrentPage]);
 
   const indexOfLastEmail = currentPage * emailsPerPage;
   const indexOfFirstEmail = indexOfLastEmail - emailsPerPage;
@@ -50,11 +51,6 @@ const EmailList: React.FC<EmailListProps> = ({ onSelectEmail }) => {
     setCurrentPage(value);
   };
 
-  const handleEmailsPerPageChange = (event: SelectChangeEvent<number>) => {
-    setEmailsPerPage(parseInt(event.target.value as string, 10));
-    setCurrentPage(1);
-  };
-
   const firstEmailNumber = indexOfFirstEmail + 1;
   const lastEmailNumber = Math.min(indexOfLastEmail, filteredEmails.length);
 
@@ -70,6 +66,7 @@ const EmailList: React.FC<EmailListProps> = ({ onSelectEmail }) => {
           filterStarred={filterStarred}
           setFilterStarred={setFilterStarred}
           onChange={handlePageChange}
+          selectedEmailPage={selectedEmailPage} 
         />
       </Box>
       <List disablePadding>

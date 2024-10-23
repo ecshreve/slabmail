@@ -1,13 +1,16 @@
 // /components/Header.tsx
 import { Search as SearchIcon } from '@mui/icons-material';
-import { AppBar, Box, InputBase, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, IconButton, InputBase, Toolbar, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import theme from '../../styles/theme';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  title: string;
+  onClick: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ title, onClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const navigator = useNavigate();
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     // Here you would call a search API or filter function with searchQuery
@@ -17,9 +20,12 @@ const Header: React.FC = () => {
     <AppBar position="static" sx={{ backgroundColor: theme.palette.primary.main, borderRadius: '5px' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Logo/Title */}
-        <Typography variant="h6" sx={{ cursor: 'pointer', textDecoration: 'none', color: 'white' }} onClick={() => navigator('/')}>
-          slabmail
-        </Typography>
+
+        <IconButton onClick={onClick} sx={{ '&:hover': { backgroundColor: theme.palette.primary.light, borderRadius: '5px', border: '1px solid white' } }}>
+          <Typography variant="h6" sx={{ cursor: 'pointer', textDecoration: 'none', color: 'white' }}>
+            {title}
+          </Typography>
+        </IconButton>
 
         {/* Search Bar */}
         <Box
