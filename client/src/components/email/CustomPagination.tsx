@@ -58,11 +58,12 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
         }
     }, [currentPage, totalPages, onChange]);
 
-        // Handlers for pagination navigation
+    // Handlers for pagination navigation
     const handlePrev = () => currentPage > 1 && onChange(null, currentPage - 1);
     const handleNext = () => currentPage < totalPages && onChange(null, currentPage + 1);
 
     // Render custom pagination items
+    // If the selected email page is not the current page, render a divider under it
     const renderPaginationItem = (item: any) => (
         <>
             <PaginationItem {...item} />

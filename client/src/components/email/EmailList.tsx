@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import React, { ChangeEvent, useContext, useMemo, useState } from 'react';
 import { EmailContext } from '../../contexts/EmailContext';
-import CustomPagination from '../shared/CustomPagination';
+import CustomPagination from './CustomPagination';
 import EmailListItem from './EmailListItem';
 
 interface EmailListProps {
@@ -62,9 +62,9 @@ const EmailList: React.FC<EmailListProps> = ({ currentPage, selectedEmailPage, s
           <EmailListItem
             key={email.id}
             email={email}
-            toggleStarred={toggleStarred}
             selectedEmailId={selectedId}
-            handleSelectEmail={handleEmailClick}
+            onToggleStarred={toggleStarred}
+            onSelectEmail={handleEmailClick}
           />
         ))}
       </List>

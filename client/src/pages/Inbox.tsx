@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import React, { useState } from 'react';
 import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
-import Header from '../components/shared/Header';
+import Header from '../components/header/Header';
 
 
 const Inbox: React.FC = () => {
