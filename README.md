@@ -2,16 +2,6 @@
 
 ![demo](images/demo.gif)
 
-## Features
-- [x] Fetch emails from Gmail
-- [x] Display emails in a list
-- [x] Display labels in a sidebar
-- [x] Display email content
-- [x] Star/unstar emails
-- [x] Backend tracing with zipkin
-- [x] Frontend tracing with zipkin
-- [ ] Search emails
-- [ ] Filter emails
 
 > [!NOTE] 
 > This depends on a Google Cloud project with the Gmail API enabled and the necessary credentials.
@@ -70,26 +60,9 @@ The backend is a simple Node.js server that uses the Gmail API to fetch emails.
 
 ### `/client`
 
-The frontend is a React app that displays a list of emails fetched from the server.
+This project is an offline-first email client built using React and TypeScript.
 
-#### Directory Structure
-
-```bash
-/client
-├── /public # static files
-├── /src
-│   ├── /components  # dumb presentational components
-│   ├── /contexts    # contexts for state management
-│   ├── /hooks       # custom hooks
-│   ├── /pages       # pages/routes
-│   ├── /services    # api clients
-│   ├── /styles      # global styles
-│   ├── /types       # typescript types
-│   ├── /utils       # misc utilities
-│   ├── otel.ts      # opentelemetry setup
-│   └── App.tsx      # main app component
-└── package.json
-```
+See [`client/README.md`](./client/README.md) for more information.
 
 ### `/docker-compose.yml`
 

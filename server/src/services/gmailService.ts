@@ -74,7 +74,7 @@ export async function listEmails(auth: Auth.OAuth2Client): Promise<any[]> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.messages.list({
     userId: "me",
-    maxResults: 10,
+    maxResults: 100,
   });
   const messages = res.data.messages;
   if (!messages || messages.length === 0) {
@@ -123,8 +123,7 @@ export async function fetchMessageDetails(
               )!.body!.data!,
               "base64"
             ).toString("utf-8"),
-          labelIds: msg.data.labelIds,
-          isStarred: msg.data.labelIds?.includes("STARRED"),
+            starred: msg.data.labelIds?.includes("STARRED") ? true : false,
         };
       })
     );
@@ -157,16 +156,20 @@ export async function fetchMessageById(
  * @param {string} id The ID of the message.
  * @returns {Promise<any>} The message details.
  */
-export async function starMessage(auth: Auth.OAuth2Client, id: string): Promise<any> {
+export async function starMessage(auth: Auth.OAuth2Client, id: string, setStarred: boolean): Promise<any> {
   const gmail = google.gmail({ version: "v1", auth });
-  const res = await gmail.users.messages.modify({
+  if (setStarred) {
+    const res = await gmail.users.messages.modify({
     userId: "me",
     id: id,
     requestBody: {
       addLabelIds: ["STARRED"],
-    },
-  });
-  return res.data;
+      },
+    });
+    return res.data;
+  } else {
+    return await unstarMessage(auth, id);
+  }
 }
 
 /**
@@ -189,4 +192,25 @@ export async function unstarMessage(
     },
   });
   return res.data;
+}
+
+/**
+ * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @returns {Promise<any[]>} An array of email objects.
+ */
+export async function fetchDefaultEmails(auth: Auth.OAuth2Client): Promise<any[]> {
+  const gmail = google.gmail({ version: "v1", auth });
+  const res = await gmail.users.messages.list({
+    userId: "me",
+    labelIds: ["INBOX", "UNREAD", "STARRED"],
+    maxResults: 100,
+  });
+  const messages = res.data.messages;
+  if (!messages || messages.length === 0) {
+    console.log("No messages found for default labels.");
+    return [];
+  }
+  return messages;
 }

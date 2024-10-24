@@ -1,13 +1,14 @@
 import express from "express";
 import { authorize } from "../auth";
 import {
+  fetchDefaultEmails,
+  fetchLabelById,
   fetchLabelDetails,
   fetchLabels,
   fetchMessageById,
   fetchMessageDetails,
   listEmails,
-  starMessage,
-  unstarMessage
+  starMessage
 } from "../services/gmailService";
 
 const router = express.Router();
@@ -49,29 +50,6 @@ router.get("/emails/:id", async (req, res) => {
 });
 
 /**
- * Stars or unstars an email by ID.
- * 
- * @route GET /emails/:id/star
- * @returns {Object} A success status.
- */
-router.get("/emails/:id/star", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { starred } = req.query;
-    const auth = await authorize();
-    if (starred === 'true') {
-      await unstarMessage(auth, id);
-    } else {
-      await starMessage(auth, id);
-    }
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
-  }
-});
-
-/**
  * Fetches all labels for the user.
  * 
  * @route GET /labels
@@ -86,6 +64,61 @@ router.get("/labels", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching labels.");
+  }
+});
+
+/**
+ * Fetches a label by ID.
+ * 
+ * @route GET /labels/:id
+ * @returns {Object} A label object.
+ */
+router.get("/labels/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auth = await authorize();
+    const label = await fetchLabelById(auth, id);
+    res.status(200).json(label);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the label.");
+  }
+});
+
+
+/**
+ * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
+ * 
+ * @route GET /emails/labels/default
+ * @returns {Array} An array of email objects.
+ */
+router.get("/emails/labels/default", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const emails = await fetchDefaultEmails(auth);
+    const messageDetails = await fetchMessageDetails(auth, emails);
+    res.status(200).json(messageDetails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching emails by default labels.");
+  }
+});
+
+/**
+ * Updates the starred status of an email by ID.
+ * 
+ * @route PUT /emails/:id/star
+ * @returns {Object} A success status.
+ */
+router.put("/emails/:id/star/:setStarred", async (req, res) => {
+  try {
+    const { id, setStarred } = req.params;
+    const auth = await authorize();
+    await starMessage(auth, id, setStarred === 'true');
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
   }
 });
 

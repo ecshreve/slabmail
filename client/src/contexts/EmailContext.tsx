@@ -1,28 +1,66 @@
-// /contexts/EmailContext.tsx
-import React, { createContext, ReactNode, useReducer } from 'react';
-import { EmailAction, emailReducer, EmailState } from '../reducers/emailReducer';
+// src/context/EmailContext.tsx
 
-interface EmailContextType {
-  state: EmailState;
-  dispatch: React.Dispatch<EmailAction>;
-}
+import { createContext, useEffect, useState } from "react";
+import { Email } from "../types/Email";
+import { dbPromise, getEmails } from "../utils/db";
 
-const initialState: EmailState = {
-  emails: [],
-  loading: false,
-  error: null,
-};
+const STORE_NAME = 'emails';
 
-export const EmailContext = createContext<EmailContextType>({
-  state: initialState,
-  dispatch: () => null,
-});
+export const EmailContext = createContext<{
+  emails: Email[];
+  setEmails: (emails: Email[]) => void;
+  toggleStarred: (id: string) => void;
+}>({ emails: [], setEmails: () => { }, toggleStarred: () => { } });
 
-export const EmailProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(emailReducer, initialState);
+export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [emails, setEmails] = useState<Email[]>([]);
+
+  useEffect(() => {
+    const loadEmails = async () => {
+      const storedEmails = await getEmails();
+      setEmails(storedEmails);
+    };
+    loadEmails();
+  }, []);
+
+  const toggleStarred = async (id: string) => {
+    const emailIndex = emails.findIndex((email) => email.id === id);
+    if (emailIndex === -1) return;
+
+    const updatedEmail = {
+      ...emails[emailIndex],
+      starred: !emails[emailIndex].starred,
+    };
+
+    // Update IndexedDB
+    const db = await dbPromise;
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    await tx.store.put(updatedEmail);
+    await tx.done;
+
+    // Update state
+    setEmails((prevEmails) => {
+      const newEmails = [...prevEmails];
+      newEmails[emailIndex] = updatedEmail;
+      return newEmails;
+    });
+
+    // Optionally, inform the backend server
+    try {
+      await fetch(`/api/emails/${id}/star/${updatedEmail.starred}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      console.error('Failed to update star status on server:', error);
+      // Handle offline scenario
+    }
+  };
 
   return (
-    <EmailContext.Provider value={{ state, dispatch }}>
+    <EmailContext.Provider
+      value={{ emails, setEmails, toggleStarred }}
+    >
       {children}
     </EmailContext.Provider>
   );
