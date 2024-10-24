@@ -6,6 +6,5 @@
     "jsx": "react-jsx"        // Use React JSX
   },
   "include": ["src/**/*"],      // Specify where TypeScript source files are located
-  "exclude": ["node_modules"]   // Exclude node_modules from being compiled
 }
 

@@ -7,11 +7,11 @@ const STORE_NAME = 'emails';
 
 export const dbPromise = openDB(DB_NAME, 1, {
   upgrade(db) {
-    db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+    db.createObjectStore('emails', { keyPath: 'id' });
   },
 });
 
-export const getEmails = async () => {
+export const getEmails = async (): Promise<Email[]> => {
   const db = await dbPromise;
   return db.getAll(STORE_NAME);
 };
@@ -22,3 +22,4 @@ export const saveEmails = async (emails: Email[]) => {
   emails.forEach((email) => tx.store.put(email));
   await tx.done;
 };
+
