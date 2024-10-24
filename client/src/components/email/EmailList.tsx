@@ -1,74 +1,43 @@
 // src/components/EmailList.tsx
 
 import {
-  Box,
   List
 } from '@mui/material';
-import React, { ChangeEvent, useContext, useMemo, useState } from 'react';
-import { EmailContext } from '../../contexts/EmailContext';
-import CustomPagination from './CustomPagination';
+import React from 'react';
+import { Email } from '../../types/Email';
+import LoadingSpinner from '../shared/LoadingSpinner';
 import EmailListItem from './EmailListItem';
 
 interface EmailListProps {
-  currentPage: number;
-  selectedEmailPage: number | null;
-  setCurrentPage: (page: number) => void;
+  items: Email[];
+  selectedId: string | null;
   onSelectEmail: (id: string) => void;
 }
 
-const EmailList: React.FC<EmailListProps> = ({ currentPage, selectedEmailPage, setCurrentPage, onSelectEmail }) => {
-  const { emails, toggleStarred } = useContext(EmailContext);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [filterStarred, setFilterStarred] = useState<boolean>(false);
-  const [indexRange, setIndexRange] = useState<{ start: number, end: number }>({ start: 0, end: 7 });
+const EmailList: React.FC<EmailListProps> = ({ items, selectedId, onSelectEmail }) => {
 
-  const filteredEmails = useMemo(() => {
-    return filterStarred ? emails.filter((email) => email.starred) : emails;
-  }, [emails, filterStarred]);
+  if (items.length === 0) {
+    return <LoadingSpinner />;
+  }
 
-  const currentEmails = useMemo(() => {
-    return filteredEmails.slice(indexRange.start, indexRange.end);
-  }, [filteredEmails, indexRange]);
-
-  const handleEmailClick = (id: string) => {
-    setSelectedId(id);
+  const handleEmailSelect = (id: string) => {
     onSelectEmail(id);
   };
 
-  const handlePageChange = (event: ChangeEvent<unknown> | null, value: number) => {
-    setCurrentPage(value);
-    setIndexRange({ start: (value - 1) * 7, end: value * 7 });
-  }
   return (
-    <Box 
-      sx={{
-        width: '400px',
-        borderRight: '1px solid #ccc', 
-        display: 'flex', 
-        flexDirection: 'column' 
-      }}
-    >
-      <CustomPagination
-        currentPage={currentPage}
-        totalEmails={filteredEmails.length}
-        filterStarred={filterStarred}
-        setFilterStarred={setFilterStarred}
-        onChange={handlePageChange}
-        selectedEmailPage={selectedEmailPage}
-      />
-
+    <>
       <List disablePadding>
-        {currentEmails.map((email) => (
+        {items.map((email) => (
           <EmailListItem
             key={email.id}
             email={email}
-            selectedEmailId={selectedId}
-            onToggleStarred={toggleStarred}
-            onSelectEmail={handleEmailClick}
+            selected={selectedId === email.id}
+            onSelectEmail={handleEmailSelect}
           />
         ))}
       </List>
-    </Box>
+
+    </>
   );
 };
 

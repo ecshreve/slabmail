@@ -3,14 +3,15 @@
 import { createContext, useEffect, useState } from "react";
 import { Email } from "../types/Email";
 import { dbPromise, getEmails } from "../utils/db";
-
+import { syncEmails } from "../utils/sync";
 const STORE_NAME = 'emails';
 
 export const EmailContext = createContext<{
   emails: Email[];
   setEmails: (emails: Email[]) => void;
+  updateEmail: (updatedEmail: Email) => void;
   toggleStarred: (id: string) => void;
-}>({ emails: [], setEmails: () => { }, toggleStarred: () => { } });
+}>({ emails: [], setEmails: () => { }, updateEmail: () => { }, toggleStarred: () => { } });
 
 export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [emails, setEmails] = useState<Email[]>([]);
@@ -23,14 +24,9 @@ export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadEmails();
   }, []);
 
-  const toggleStarred = async (id: string) => {
-    const emailIndex = emails.findIndex((email) => email.id === id);
+  const updateEmail = async (updatedEmail: Email) => {
+    const emailIndex = emails.findIndex((email) => email.id === updatedEmail.id);
     if (emailIndex === -1) return;
-
-    const updatedEmail = {
-      ...emails[emailIndex],
-      starred: !emails[emailIndex].starred,
-    };
 
     // Update IndexedDB
     const db = await dbPromise;
@@ -44,22 +40,18 @@ export const EmailProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       newEmails[emailIndex] = updatedEmail;
       return newEmails;
     });
+  };
 
-    // Optionally, inform the backend server
-    try {
-      await fetch(`/api/emails/${id}/star/${updatedEmail.starred}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } catch (error) {
-      console.error('Failed to update star status on server:', error);
-      // Handle offline scenario
-    }
+  const toggleStarred = async (id: string) => {
+    const emailIndex = emails.findIndex((email) => email.id === id);
+    if (emailIndex === -1) return;
+    const updatedEmail = { ...emails[emailIndex], starred: !emails[emailIndex].starred };
+    await updateEmail(updatedEmail);
   };
 
   return (
     <EmailContext.Provider
-      value={{ emails, setEmails, toggleStarred }}
+      value={{ emails, setEmails, updateEmail, toggleStarred }}
     >
       {children}
     </EmailContext.Provider>

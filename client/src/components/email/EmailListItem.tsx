@@ -2,6 +2,8 @@
 
 import { Star, StarOutline } from "@mui/icons-material";
 import { Box, IconButton, ListItemButton, ListItemText } from "@mui/material";
+import { useContext } from "react";
+import { EmailContext } from "../../contexts/EmailContext";
 import theme from "../../styles/theme";
 import { Email } from "../../types/Email";
 import { formatEmailAddress, stripSpaces } from "../../utils/helpers";
@@ -9,31 +11,29 @@ import { formatEmailAddress, stripSpaces } from "../../utils/helpers";
 interface EmailListItemProps {
     // Email Data
     email: Email;
-    selectedEmailId: string | null;
+    selected: boolean;
 
     // Handlers
     onSelectEmail: (id: string) => void;
-    onToggleStarred: (id: string) => void;
 }
 
 const EmailListItem: React.FC<EmailListItemProps> = ({
     email,
-    selectedEmailId,
+    selected,
     onSelectEmail,
-    onToggleStarred,
 }) => {
-    // Prevent propagation of click event to avoid selecting email when starring it
+    const { toggleStarred } = useContext(EmailContext);
+
     const handleStarClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        onToggleStarred(email.id);
+        toggleStarred(email.id);
     };
 
     return (
         <ListItemButton
-            selected={selectedEmailId === email.id}
+            selected={selected}
             onClick={() => onSelectEmail(email.id)}
             sx={{
-                padding: '8px 12px',
                 margin: '4px 0',
                 borderRadius: '3px',
                 display: 'flex',
