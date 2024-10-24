@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import { initClientInstrumentation } from './otel';
+import { initClientInstrumentation } from './utils/otel';
 initClientInstrumentation();
 
 if ('serviceWorker' in navigator) {
