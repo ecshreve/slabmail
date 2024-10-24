@@ -1,46 +1,45 @@
-import { Box, Divider, Typography } from '@mui/material';
-import React, { ChangeEvent, useContext, useMemo, useState } from 'react';
+import { Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import EmailDetails from '../components/email/EmailDetails';
 import EmailList from '../components/email/EmailList';
-import EmailListPagination from '../components/email/EmailListPagination';
 import Header from '../components/header/Header';
-import { EmailContext } from '../contexts/EmailContext';
-
-const PAGE_SIZE = 5;
+import { Email } from '../types/Email';
+import { starEmail } from '../utils/dbdexie';
+import tracer from '../utils/otel';
+import { pushStarred } from '../utils/sync';
 
 const Inbox: React.FC = () => {
-  const { emails } = useContext(EmailContext);
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [selectedEmailPage, setSelectedEmailPage] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filterStarred, setFilterStarred] = useState<boolean>(false);
-  const [indexRange, setIndexRange] = useState<{ start: number, end: number }>({ start: 0, end: PAGE_SIZE });
 
-  const filteredEmails = useMemo(() => {
-    return filterStarred ? emails.filter((email) => email.starred) : emails;
-  }, [emails, filterStarred]);
 
-  const currentEmails = useMemo(() => {
-    return filteredEmails.slice(indexRange.start, indexRange.end);
-  }, [filteredEmails, indexRange]);
+  useEffect(() => {
+    tracer.startActiveSpan("Inbox", async (span) => {
+      window.addEventListener("onunload", () => {
+        span.end();
+      });
+    });
+  }, []);
 
-  const handleHeaderClick = () => {
-    setCurrentPage(1);
+  const handleSelect = (id: string) => {
+    tracer.startActiveSpan("handleSelect", async (span) => {
+      setSelectedEmailId(id);
+      span.end();
+    });
   };
 
-  const handleEmailSelect = (id: string) => {
-    setSelectedEmailId(id);
-    setSelectedEmailPage(currentPage);
+  const handleStarClick = async (email: Email) => {
+    tracer.startActiveSpan("handleStarClick", async (span) => {
+      await Promise.all([
+        starEmail(email),
+        pushStarred(email),
+      ]);
+      span.end();
+    });
   };
-
-  const handlePageChange = (event: ChangeEvent<unknown> | null, value: number) => {
-    setCurrentPage(value);
-    setIndexRange({ start: (value - 1) * PAGE_SIZE, end: value * PAGE_SIZE });
-  }
 
   return (
     <>
-      <Header title="slabmail" onClick={handleHeaderClick} />
+      <Header title="slabmail" onClick={() => { }} />
       <Box display="flex" height="100vh">
         <Box
           sx={{
@@ -50,32 +49,15 @@ const Inbox: React.FC = () => {
             flexDirection: 'column'
           }}
         >
-          <EmailListPagination
-            currentPage={currentPage}
-            totalItems={filteredEmails.length}
-            itemsPerPage={PAGE_SIZE}
-            filterStarred={filterStarred}
-            setFilterStarred={setFilterStarred}
-            onChange={handlePageChange}
-            selectedEmailPage={selectedEmailPage}
-          />
-          <Divider />
           <EmailList
-            items={currentEmails}
-            selectedId={selectedEmailId}
-            onSelectEmail={handleEmailSelect}
+            selectedEmailId={selectedEmailId}
+            onSelect={handleSelect}
+            onStarClick={handleStarClick}
           />
-          {filteredEmails.length > 0 && (
-            <Box p={1} display="flex" alignItems="center" justifyContent="center">
-              <Typography variant="body2" color="text.secondary">
-                showing {indexRange.start + 1} - {filteredEmails.length < indexRange.end ? filteredEmails.length : indexRange.end} of {filteredEmails.length}
-              </Typography>
-            </Box>
-          )}
         </Box>
-        {/* Right Column: Email Details */}
         <EmailDetails
-          emailId={selectedEmailId}
+          emailId={selectedEmailId ?? ''}
+          onStarClick={handleStarClick}
         />
       </Box>
     </>

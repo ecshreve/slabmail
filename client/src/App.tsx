@@ -2,31 +2,38 @@
 import { ThemeProvider } from '@mui/material/styles';
 import React, { useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { EmailProvider } from './contexts/EmailContext';
-import { useOnlineStatus } from './hooks/useOnlineStatus';
 import Inbox from './pages/Inbox';
 import theme from './styles/theme';
-import { syncEmails } from './utils/sync';
+import tracer from './utils/otel';
 
 const App: React.FC = () => {
-  const online = useOnlineStatus();
+  // useEffect(() => {
+  //   refreshEmails()
+  // }, [])
 
   useEffect(() => {
-    if (online) {
-      syncEmails();
-    }
-  }, [online]);
-  
+    const span = tracer.startSpan("App");
+
+    const handleUnload = () => {
+      span.end();
+    };
+
+    window.addEventListener("unload", handleUnload);
+
+    return () => {
+      window.removeEventListener("unload", handleUnload);
+      span.end(); // Ensure the span is ended when the component unmounts
+    };
+  }, []);
+
   return (
-    <EmailProvider>
-      <ThemeProvider theme={theme}>
-        <Router>
-            <Routes>
-              <Route path="/" element={<Inbox />} />
-            </Routes>
-          </Router>
-      </ThemeProvider>
-    </EmailProvider>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Inbox />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 

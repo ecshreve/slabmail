@@ -2,37 +2,33 @@
 
 import { Star, StarOutline } from "@mui/icons-material";
 import { Box, IconButton, ListItemButton, ListItemText } from "@mui/material";
-import { useContext } from "react";
-import { EmailContext } from "../../contexts/EmailContext";
+import { memo } from "react";
 import theme from "../../styles/theme";
 import { Email } from "../../types/Email";
 import { formatEmailAddress, stripSpaces } from "../../utils/helpers";
 
 interface EmailListItemProps {
-    // Email Data
     email: Email;
     selected: boolean;
-
-    // Handlers
-    onSelectEmail: (id: string) => void;
+    onSelect: (id: string) => void;
+    onStarClick: () => void;
 }
 
-const EmailListItem: React.FC<EmailListItemProps> = ({
+const EmailListItem: React.FC<EmailListItemProps> = memo(({
     email,
     selected,
-    onSelectEmail,
+    onSelect,
+    onStarClick
 }) => {
-    const { toggleStarred } = useContext(EmailContext);
 
-    const handleStarClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-        toggleStarred(email.id);
+    const handleSelect = () => {
+        onSelect(email.id);
     };
 
     return (
         <ListItemButton
             selected={selected}
-            onClick={() => onSelectEmail(email.id)}
+            onClick={handleSelect}
             sx={{
                 margin: '4px 0',
                 borderRadius: '3px',
@@ -55,7 +51,7 @@ const EmailListItem: React.FC<EmailListItemProps> = ({
                 <IconButton
                     sx={{ width: '48px', height: '48px', '&:hover': { backgroundColor: theme.palette.action.focus } }}
                     edge="end"
-                    onClick={handleStarClick}
+                    onClick={onStarClick}
                 >
                     {email.starred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
                 </IconButton>
@@ -63,40 +59,54 @@ const EmailListItem: React.FC<EmailListItemProps> = ({
 
             {/* Footer: Email Date */}
             <Box display="flex" width="100%" justifyContent="flex-end">
-                <ListItemText
-                    secondary={new Date(parseInt(email.date)).toLocaleString()}
-                    sx={{ fontSize: '14px' }}
-                />
+                <EmailFooter date={email.date} />
             </Box>
         </ListItemButton>
+    );  
+}, (prevProps, nextProps) => {
+    return prevProps.selected === nextProps.selected && prevProps.email.starred === nextProps.email.starred;
+});
+
+const EmailFooter: React.FC<{ date: string }> = memo(({ date }) => {
+    return (
+        <ListItemText
+            secondary={new Date(parseInt(date)).toLocaleString()}
+            sx={{ fontSize: '14px' }}
+        />
     );
-};
+}, (prevProps, nextProps) => {
+    return prevProps.date === nextProps.date;
+});
 
 // Reusable Component for Email Content (Subject and Sender)
-const EmailContent: React.FC<{ subject: string; sender: string }> = ({ subject, sender }) => (
-    <ListItemText
-        primary={stripSpaces(subject)}
-        primaryTypographyProps={{
-            sx: {
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-            },
-        }}
-        secondary={formatEmailAddress(sender)}
-        secondaryTypographyProps={{
-            sx: {
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                lineBreak: 'anywhere',
-                display: '-webkit-box',
-                WebkitLineClamp: 1,
-                WebkitBoxOrient: 'vertical',
-            },
-        }}
-    />
-);
+const EmailContent: React.FC<{ subject: string; sender: string }> = memo(({ subject, sender }) => {
+    return (
+        <ListItemText
+            primary={stripSpaces(subject)}
+            primaryTypographyProps={{
+                sx: {
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                },
+            }}
+            secondary={formatEmailAddress(sender)}
+            secondaryTypographyProps={{
+                sx: {
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    lineBreak: 'anywhere',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                },
+            }}
+        />
+    );
+}, (prevProps, nextProps) => {
+    return prevProps.subject === nextProps.subject && prevProps.sender === nextProps.sender;
+} );
 
 export default EmailListItem;

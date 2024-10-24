@@ -8,14 +8,15 @@ import {
   fetchMessageById,
   fetchMessageDetails,
   listEmails,
-  starMessage
+  starMessage,
+  unstarMessage,
 } from "../services/gmailService";
 
 const router = express.Router();
 
 /**
  * Fetches all emails from the user's mailbox.
- * 
+ *
  * @route GET /emails
  * @returns {Array} An array of email objects.
  */
@@ -33,7 +34,7 @@ router.get("/emails", async (req, res) => {
 
 /**
  * Fetches a single email by ID.
- * 
+ *
  * @route GET /emails/:id
  * @returns {Object} An email object.
  */
@@ -51,7 +52,7 @@ router.get("/emails/:id", async (req, res) => {
 
 /**
  * Fetches all labels for the user.
- * 
+ *
  * @route GET /labels
  * @returns {Array} An array of label objects.
  */
@@ -69,7 +70,7 @@ router.get("/labels", async (req, res) => {
 
 /**
  * Fetches a label by ID.
- * 
+ *
  * @route GET /labels/:id
  * @returns {Object} A label object.
  */
@@ -85,10 +86,9 @@ router.get("/labels/:id", async (req, res) => {
   }
 });
 
-
 /**
  * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
- * 
+ *
  * @route GET /emails/labels/default
  * @returns {Array} An array of email objects.
  */
@@ -100,25 +100,33 @@ router.get("/emails/labels/default", async (req, res) => {
     res.status(200).json(messageDetails);
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while fetching emails by default labels.");
+    res
+      .status(500)
+      .send("An error occurred while fetching emails by default labels.");
   }
 });
 
 /**
  * Updates the starred status of an email by ID.
- * 
+ *
  * @route PUT /emails/:id/star
  * @returns {Object} A success status.
  */
 router.put("/emails/:id/star/:setStarred", async (req, res) => {
   try {
-    const { id, setStarred } = req.params;
     const auth = await authorize();
-    await starMessage(auth, id, setStarred === 'true');
-    res.status(200).json({ success: true });
+    const { id, setStarred } = req.params;
+
+    let starredMessage, unstarredMessage;
+    if (setStarred === "true") {
+      starredMessage = await starMessage(auth, id);
+    } else {
+      unstarredMessage = await unstarMessage(auth, id);
+    }
+    res.status(200).json(starredMessage || unstarredMessage);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "An error occurred while starring the email." });
+    res.status(500).send("An error occurred while starring the email.");
   }
 });
 

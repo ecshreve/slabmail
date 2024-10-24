@@ -9,103 +9,77 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
-import { EmailContext } from '../../contexts/EmailContext';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { memo } from 'react';
 import { Email } from '../../types/Email';
+import { db } from '../../utils/dbdexie';
 import { formatDate, formatEmailAddress } from '../../utils/helpers';
-import LoadingSpinner from '../shared/LoadingSpinner';
 
 interface EmailDetailProps {
-  emailId: string | null;
+  emailId: string;
+  onStarClick: (email: Email) => void;
 }
 
-const EmailDetail: React.FC<EmailDetailProps> = ({ emailId }) => {
-  // Context & State
-  const { emails, toggleStarred } = useContext(EmailContext);
-  const [email, setEmail] = useState<Email | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Effect: Load email based on emailId
-  useEffect(() => {
-    if (emailId) {
-      setIsLoading(true);
-      const selectedEmail = emails.find((e) => e.id === emailId) || null;
-      setEmail(selectedEmail);
-      setIsLoading(false);
-    } else {
-      setEmail(null);
-      setIsLoading(false);
-    }
-  }, [emailId, emails]);
-
-  // Handlers
-  const onDeleteEmail = () => setEmail(null);
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <Box flex={2} p={2} display="flex" alignItems="center" justifyContent="center">
-        <LoadingSpinner />
-      </Box>
-    );
-  }
-
-  // No email selected
-  if (!email) {
-    return (
-      <Box flex={2} p={2}>
-        <Typography variant="h6" color="textSecondary">
-          Select an email to view its details.
-        </Typography>
-      </Box>
-    );
-  }
-
-  const handleStarClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    toggleStarred(email.id);
-};
+const EmailDetail: React.FC<EmailDetailProps> = ({ emailId, onStarClick }) => {
+  const selectedEmail = useLiveQuery(
+    () => db.emails.get(emailId),
+    [emailId]
+  );
 
   return (
-    <Box flex={2} p={2} overflow="auto">
-      {/* Email Header */}
-      <EmailHeader 
-        subject={email.subject} 
-        isStarred={email.starred} 
-        onClick={handleStarClick}
-      />
+    <>
+      {selectedEmail && (
+        <Box flex={2} p={2} overflow="auto">
+          {/* Email Header */}
+          <EmailHeader
+            subject={selectedEmail.subject}
+            isStarred={selectedEmail.starred}
+            onClick={() => onStarClick(selectedEmail)}
+          />
 
-      <Typography variant="subtitle1" color="textSecondary">
-        From: {formatEmailAddress(email.sender)}
-      </Typography>
-      <Typography variant="subtitle2" color="textSecondary">
-        Date: {formatDate(email.date)}
-      </Typography>
+          <EmailInfo sender={selectedEmail.sender} date={selectedEmail.date} />
 
-      {/* Action Buttons */}
-      <EmailActions onDelete={onDeleteEmail} />
+          {/* Action Buttons */}
+          <EmailActions onDelete={() => { }} />
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      {/* Email Body */}
-      <EmailBody body={email.body} />
-    </Box>
+          {/* Email Body */}
+          {selectedEmail.body && <EmailBody body={selectedEmail.body} />}
+        </Box>
+      )}
+    </>
   );
 };
 
 // Email Header Component
-const EmailHeader: React.FC<{ subject: string, isStarred: boolean, onClick: (e: React.MouseEvent<HTMLButtonElement>) => void }> = ({ subject, isStarred, onClick }) => {
+const EmailHeader: React.FC<{ subject: string, isStarred: boolean, onClick: (e: React.MouseEvent<HTMLButtonElement>) => void }> = memo(({ subject, isStarred, onClick }) => {
   return (
     <Box display="flex" justifyContent="space-between" width="100%">
       <Typography variant="h5" gutterBottom>
-      {subject}
-    </Typography>
-    <IconButton edge="end" onClick={onClick}>
-      {isStarred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
-    </IconButton>
+        {subject}
+      </Typography>
+      <IconButton edge="end" onClick={onClick}>
+        {isStarred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
+      </IconButton>
     </Box>
   );
-};
+}, (prevProps, nextProps) => {
+  return prevProps.isStarred === nextProps.isStarred;
+});
+
+const EmailInfo: React.FC<{ sender: string, date: string }> = memo(({ sender, date }) => (
+  <>
+    <Typography variant="subtitle1" color="textSecondary">
+      From: {formatEmailAddress(sender)}
+    </Typography>
+    <Typography variant="subtitle2" color="textSecondary">
+      Date: {formatDate(date)}
+    </Typography>
+  </>
+), (prevProps, nextProps) => {
+  return prevProps.sender === nextProps.sender && prevProps.date === nextProps.date;
+});
 
 // Email Action Buttons Component
 const EmailActions: React.FC<{ onDelete: () => void }> = ({ onDelete }) => (

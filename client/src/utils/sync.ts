@@ -1,39 +1,41 @@
-// src/utils/sync.ts
+import { Email } from "../types/Email";
+import { db } from "./dbdexie";
+import tracer from "./otel";
 
-import { Email } from '../types/Email';
-import { getEmails, saveEmails } from './db';
+const putEmails = async (serverEmails: Email[]) => {
+  tracer.startActiveSpan("putEmails", async (span) => {
+    await db.emails.bulkPut(serverEmails);
+    span.end();
+  });
+};
 
-export const syncEmails = async () => {
-  try {
-    const response = await fetch('/api/emails');
-    if (!response.ok) throw new Error('Network response was not ok');
-    const serverEmails: Email[] = await response.json();
+export const refreshEmails = async () => {
+  tracer.startActiveSpan("refreshEmails", async (span) => {
+    // Sync to server
+    try {
+      const response = await fetch("/api/emails");
+      if (!response.ok) throw new Error("Network response was not ok");
+      const serverEmails: Email[] = await response.json();
+      await putEmails(serverEmails);
+    } catch (error) {
+      console.error("Failed to sync emails:", error);
+    }
+    span.end();
+  });
+};
 
-    // Merge local emails with server emails
-    const localEmails = await getEmails();
-    const mergedEmails = await Promise.all(serverEmails.map(async (serverEmail) => {
-      const localEmail = localEmails.find((e) => e.id === serverEmail.id);
-      if (localEmail) {
-        // If the local email has a different starred status, prefer the local one
-        if (localEmail.starred !== serverEmail.starred) {
-          serverEmail.starred = localEmail.starred;
-          // update the server email with the local starred status
-          try {
-            await fetch(`/api/emails/${serverEmail.id}/star/${serverEmail.starred}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-            });
-          } catch (error) {
-            console.error('Failed to update star status on server:', error);
-            // Handle offline scenario
-          }
-        }
-      }
-      return serverEmail;
-    }));
-
-    await saveEmails(mergedEmails);
-  } catch (error) {
-    console.error('Failed to sync emails:', error);
-  }
+export const pushStarred = async (email: Email) => {
+  tracer.startActiveSpan("pushStarred", async (span) => {
+    // Sync to server
+    try {
+      await fetch(`/api/emails/${email.id}/star/${!email.starred}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("Failed to update star status on server:", error);
+      // Handle offline scenario
+    }
+    span.end();
+  });
 };

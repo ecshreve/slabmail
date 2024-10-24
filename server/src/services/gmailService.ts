@@ -124,6 +124,7 @@ export async function fetchMessageDetails(
               "base64"
             ).toString("utf-8"),
             starred: msg.data.labelIds?.includes("STARRED") ? true : false,
+            labelIds: msg.data.labelIds,
         };
       })
     );
@@ -156,20 +157,25 @@ export async function fetchMessageById(
  * @param {string} id The ID of the message.
  * @returns {Promise<any>} The message details.
  */
-export async function starMessage(auth: Auth.OAuth2Client, id: string, setStarred: boolean): Promise<any> {
+export async function starMessage(auth: Auth.OAuth2Client, id: string): Promise<{
+  id: string;
+  labelIds: string[];
+  success: boolean;
+}> {
   const gmail = google.gmail({ version: "v1", auth });
-  if (setStarred) {
-    const res = await gmail.users.messages.modify({
+  const res = await gmail.users.messages.modify({
     userId: "me",
     id: id,
     requestBody: {
       addLabelIds: ["STARRED"],
-      },
-    });
-    return res.data;
-  } else {
-    return await unstarMessage(auth, id);
-  }
+    },
+  });
+
+  return {
+    id: res.data.id!,
+    labelIds: res.data.labelIds!,
+    success: true,
+  };
 }
 
 /**

@@ -4,6 +4,7 @@ export interface Email {
   body: string;
   sender: string;
   date: string;
+  labelIds: string[];
   starred: boolean;
 }
 
