@@ -74,7 +74,7 @@ export async function listEmails(auth: Auth.OAuth2Client): Promise<any[]> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.messages.list({
     userId: "me",
-    maxResults: 100,
+    maxResults: 10,
   });
   const messages = res.data.messages;
   if (!messages || messages.length === 0) {
@@ -87,6 +87,7 @@ export async function listEmails(auth: Auth.OAuth2Client): Promise<any[]> {
 /**
  * Fetches the details for a list of messages.
  *
+ * @deprecated
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
  * @param {gmail_v1.Schema$Message[]} messages An array of message objects.
  * @returns {Promise<any[]>} An array of message details.
@@ -136,7 +137,30 @@ export async function fetchMessageDetails(
 }
 
 /**
+ * Fetches a list of messages and their details.
+ *
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @returns {Promise<any[]>} An array of message objects.
+ */
+export async function fetchMessages(auth: Auth.OAuth2Client): Promise<any[]> {
+  try {
+    const messages = await listEmails(auth);
+    const messageDetails = await Promise.all(
+      messages.map(async (message) => {
+        return await fetchMessageById(auth, message.id!);
+      })
+    );
+    return messageDetails;
+  } catch (error) {
+    console.error("Error fetching message details:", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
+}
+
+/**
  * Fetches a single message by ID.
+ * 
+ * !!NOTE: this type definition is subtly different than the existing Email type.
  *
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
  * @param {string} id The ID of the message.
@@ -146,8 +170,32 @@ export async function fetchMessageById(
   auth: Auth.OAuth2Client,
   id: string
 ): Promise<any> {
-  const messages = await fetchMessageDetails(auth, [{ id }]);
-  return messages[0];
+  try {
+    const gmail = google.gmail({ version: "v1", auth });
+    const msg = await gmail.users.messages.get({
+      userId: "me",
+      id: id,
+    });
+    const messageDetails = {
+      messageId: msg.data.id,
+      sender: msg.data.payload?.headers?.find(
+        (header) => header.name === "From"
+      )?.value,
+      subject: msg.data.payload?.headers?.find(
+        (header) => header.name === "Subject"
+      )?.value,
+      snippet: msg.data.snippet,
+      receivedMs: msg.data.internalDate,
+      labels: msg.data.labelIds,
+      body: msg.data.payload?.parts?.find(
+        (part) => part.mimeType === "text/plain"
+      )?.body?.data,
+    };
+    return messageDetails;
+  } catch (error) {
+    console.error("Error fetching message details:", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
 }
 
 /**
@@ -157,7 +205,10 @@ export async function fetchMessageById(
  * @param {string} id The ID of the message.
  * @returns {Promise<any>} The message details.
  */
-export async function starMessage(auth: Auth.OAuth2Client, id: string): Promise<{
+export async function starMessage(
+  auth: Auth.OAuth2Client,
+  id: string
+): Promise<{
   id: string;
   labelIds: string[];
   success: boolean;
@@ -202,11 +253,13 @@ export async function unstarMessage(
 
 /**
  * Fetches emails for the default set of labels: ['INBOX', 'STARRED', 'UNREAD']
- * 
+ *
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
  * @returns {Promise<any[]>} An array of email objects.
  */
-export async function fetchDefaultEmails(auth: Auth.OAuth2Client): Promise<any[]> {
+export async function fetchDefaultEmails(
+  auth: Auth.OAuth2Client
+): Promise<any[]> {
   const gmail = google.gmail({ version: "v1", auth });
   const res = await gmail.users.messages.list({
     userId: "me",

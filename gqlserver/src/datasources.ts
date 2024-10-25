@@ -2,22 +2,24 @@
 // for type safety in our data source class
 import { Message } from "./__generated__/resolvers-types";
 
-const MessagesDB: Omit<Required<Message>, "__typename">[] = [
+const MessagesDB: Message[] = [
   {
     messageId: "111",
-    sender: "John Doe",
-    recipient: "Jane Doe",
+    sender: "john@doe.com",
     subject: "Hello",
+    snippet: "Hello, how are you?",
     body: "Hello, how are you?",
-    labels: ["unread", "starred"],
+    receivedMs: 1725794400000,
+    labels: ["UNREAD", "STARRED"],
   },
   {
     messageId: "222",
-    sender: "John Doe",
-    recipient: "Jane Doe",
+    sender: "john@doe.com",
     subject: "Hello",
-    body: "Hello, how are you?",
-    labels: ["unread", "new"],
+    snippet: "Hello, how are you?",
+    body: "Hello, how are you? and this is a longer body",
+    receivedMs: 1725794400000,
+    labels: ["UNREAD", "NEW"],
   },
 ];
 

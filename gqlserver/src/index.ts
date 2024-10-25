@@ -3,6 +3,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
 import { MessagesDataSource } from "./datasources.js";
 import resolvers from "./resolvers/index.js";
+import { SlabmailAPI } from "./slabmail-api.js";
 
 // Note: this only works locally because it relies on `npm` routing
 // from the root directory of the project.
@@ -11,6 +12,7 @@ const typeDefs = readFileSync("./schema.graphql", { encoding: "utf-8" });
 export interface MyContext {
   dataSources: {
     messagesAPI: MessagesDataSource;
+    slabmailAPI: SlabmailAPI;
   };
 }
 
@@ -29,6 +31,7 @@ const { url } = await startStandaloneServer(server, {
       // or your REST API classes.
       dataSources: {
         messagesAPI: new MessagesDataSource(),
+        slabmailAPI: new SlabmailAPI(),
       },
     };
   },

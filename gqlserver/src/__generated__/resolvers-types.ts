@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { MyContext } from '../index';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -13,16 +13,18 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
 };
 
 export type Message = {
   __typename?: 'Message';
-  body: Scalars['String'];
-  labels: Array<Scalars['String']>;
+  body?: Maybe<Scalars['String']>;
+  labels?: Maybe<Array<Scalars['String']>>;
   messageId: Scalars['String'];
-  recipient: Scalars['String'];
+  receivedMs: Scalars['DateTime'];
   sender: Scalars['String'];
-  subject: Scalars['String'];
+  snippet?: Maybe<Scalars['String']>;
+  subject?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -123,6 +125,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Message: ResolverTypeWrapper<Message>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -133,6 +136,7 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
+  DateTime: Scalars['DateTime'];
   ID: Scalars['ID'];
   Message: Message;
   Mutation: {};
@@ -140,13 +144,18 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String'];
 }>;
 
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
+}
+
 export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
-  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  labels?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  labels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   messageId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  recipient?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  receivedMs?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   sender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  subject?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  snippet?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subject?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -161,6 +170,7 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
 }>;
 
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
+  DateTime?: GraphQLScalarType;
   Message?: MessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

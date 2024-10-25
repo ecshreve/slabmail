@@ -7,6 +7,7 @@ import {
   fetchLabels,
   fetchMessageById,
   fetchMessageDetails,
+  fetchMessages,
   listEmails,
   starMessage,
   unstarMessage,
@@ -129,5 +130,43 @@ router.put("/emails/:id/star/:setStarred", async (req, res) => {
     res.status(500).send("An error occurred while starring the email.");
   }
 });
+
+/**
+ * Fetches all messages from the Gmail API.
+ *
+ * @route GET /messages
+ * @returns {Array} An array of message objects.
+ */
+router.get("/messages", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const msgList = await fetchMessages(auth);
+    res.status(200).json(msgList);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching emails.");
+  }
+});
+
+
+/**
+ * Fetches a single message by ID.
+ *
+ * @route GET /messages/:id
+ * @returns {Object} The message details.
+ */
+router.get("/messages/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const auth = await authorize();
+    const message = await fetchMessageById(auth, id);
+    res.status(200).json(message);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the message.");
+  }
+});
+
+
 
 export default router;
