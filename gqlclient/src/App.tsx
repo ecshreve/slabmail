@@ -4,12 +4,13 @@ import './App.css';
 import Header from './components/Header';
 import MessageDetail from './components/MessageDetail';
 import { MessageList } from './components/MessageList';
-import { Message } from './types';
+
 export default function App() {
   const [selectedMessageId, setSelectedMessageId] = useState<string>('');
 
-  const handleStarClick = (message: Message) => {
-    console.log('Star clicked for message:', message);
+  const handleStarClick = (messageId: string) => {
+    console.log('Star clicked for message:', messageId);
+    // TODO: Implement star click
   };
 
   const handleMessageSelect = useCallback((messageId: string) => {
@@ -31,7 +32,7 @@ export default function App() {
           <MessageList onMessageSelect={handleMessageSelect} />
         </Box>
         <Box display="flex" >
-          <MessageDetail messageId={selectedMessageId} onStarClick={handleStarClick} />
+          <MessageDetail messageId={selectedMessageId} onStarClick={() => handleStarClick(selectedMessageId)} />
         </Box>
       </Box>
     </>

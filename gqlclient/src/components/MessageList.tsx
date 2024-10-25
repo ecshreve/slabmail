@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client';
 import { Box, List } from '@mui/material';
 import { useState } from 'react';
 import { GET_MESSAGE_LIST } from '../queries';
-import { Message } from '../types';
 import LoadingSpinner from './LoadingSpinner';
 import MessageListControls from './MessageListControls';
 import MessageListItem from './MessageListItem';
@@ -20,17 +19,17 @@ export const MessageList = ({ onMessageSelect }: MessageListProps) => {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <p>Error : {error.message}</p>;
+  if (!data || !data.messages) return <p>No data</p>;
 
-  const totalPages = Math.ceil(data.messages.length / PAGE_SIZE);
-  const messages: Message[] = data.messages.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const filteredMessages = filterStarred ? messages.filter((message: Message) => message.labels.includes('STARRED')) : messages;
+  const totalPages = Math.ceil((data.messages.length ?? 0) / PAGE_SIZE);
+  const filteredMessages = filterStarred ? data.messages.filter((message) => message?.labels?.includes('STARRED')) : data.messages;
 
   if (filteredMessages.length === 0) {
     return <p>No messages found</p>;
   }
 
-  const onStarClick = (email: Message) => {
-    console.log('Star clicked for email:', email);
+  const onStarClick = (messageId: string) => {
+    console.log('Star clicked for email:', messageId);
   };
 
   const handleStarredFilterChange = () => {
@@ -51,17 +50,19 @@ export const MessageList = ({ onMessageSelect }: MessageListProps) => {
           onStarredFilterChange={handleStarredFilterChange}
           currentFilter={filterStarred ? ['STARRED'] : []}
         />
-        
+
       </Box>
       <List>
-        {filteredMessages.map((message: Message, index: number) => (
-          <MessageListItem
-            key={message.id}
-            message={message}
-            selected={selectedMessageIndex === index}
-            onSelect={() => handleMessageSelect(message.id)}
-            onStarClick={() => onStarClick(message)}
-          />
+        {filteredMessages.map((message, index) => (
+          message && (
+            <MessageListItem
+              key={message.messageId}
+              messageId={message.messageId}
+              selected={selectedMessageIndex === index}
+              onSelect={() => handleMessageSelect(message.messageId)}
+              onStarClick={() => onStarClick(message.messageId)}
+            />
+          )
         ))}
       </List>
     </>
