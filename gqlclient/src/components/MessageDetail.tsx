@@ -13,24 +13,22 @@ import {
 import { memo } from 'react';
 import { formatDate, formatEmailAddress } from '../helpers';
 import { GET_MESSAGE_DETAIL } from '../queries';
-import { Message } from '../types';
 import LoadingSpinner from './LoadingSpinner';
 
 
 interface MessageDetailProps {
     messageId: string;
-    onStarClick: (email: Message) => void;
+    onStarClick: () => void;
 }
 
 const MessageDetail: React.FC<MessageDetailProps> = ({ messageId, onStarClick }) => {
-    if (!messageId || messageId === '') return null;
-
-    const { loading, error, data } = useQuery(GET_MESSAGE_DETAIL, { variables: { id: messageId } });
+    const { loading, error, data } = useQuery(GET_MESSAGE_DETAIL, { variables: { messageId } });
 
     if (loading) return <LoadingSpinner />;
     if (error) return <p>Error: {error.message}</p>;
+    if (!data || !data.message) return <p>No data</p>;
 
-    const message: Message = data?.message;
+    const message = data.message;
 
     return (
         <>
@@ -38,12 +36,12 @@ const MessageDetail: React.FC<MessageDetailProps> = ({ messageId, onStarClick })
                 <Box flex={2} p={2} overflow="auto">
                     {/* Message Header */}
                     <MessageHeader
-                        subject={message.subject}
-                        isStarred={message.labels.includes('STARRED')}
-                        onClick={() => onStarClick(message)}
+                        subject={message.subject ?? ''}
+                        starred={message.labels?.includes('STARRED') ?? false}
+                        onClick={onStarClick}
                     />
 
-                    <MessageInfo sender={message.sender} date={formatDate(message.receivedAt)} />
+                    <MessageInfo sender={message.sender} date={formatDate(message.receivedMs)} />
 
                     {/* Action Buttons */}
                     <MessageActions onDelete={() => { }} />
@@ -59,19 +57,19 @@ const MessageDetail: React.FC<MessageDetailProps> = ({ messageId, onStarClick })
 };
 
 // Message Header Component
-const MessageHeader: React.FC<{ subject: string, isStarred: boolean, onClick: (e: React.MouseEvent<HTMLButtonElement>) => void }> = memo(({ subject, isStarred, onClick }) => {
+const MessageHeader: React.FC<{ subject: string, starred: boolean, onClick: () => void }> = memo(({ subject, starred, onClick }) => {
     return (
         <Box display="flex" justifyContent="space-between" width="100%">
             <Typography variant="h5" gutterBottom>
                 {subject}
             </Typography>
             <IconButton edge="end" onClick={onClick}>
-                {isStarred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
+                {starred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
             </IconButton>
         </Box>
     );
 }, (prevProps, nextProps) => {
-    return prevProps.isStarred === nextProps.isStarred;
+    return prevProps.starred === nextProps.starred && prevProps.subject === nextProps.subject;
 });
 
 const MessageInfo: React.FC<{ sender: string, date: string }> = memo(({ sender, date }) => (

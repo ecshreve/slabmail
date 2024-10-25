@@ -1,5 +1,5 @@
 import { RESTDataSource } from '@apollo/datasource-rest';
-import { Message } from './__generated__/resolvers-types';
+import { Message, MessageConnection } from './__generated__/resolvers-types';
 
 export class SlabmailAPI extends RESTDataSource {
   override baseURL = 'http://localhost:3000/api/';
@@ -8,8 +8,8 @@ export class SlabmailAPI extends RESTDataSource {
     return this.get<Message>(`messages/${encodeURIComponent(id)}`);
   }
 
-  async getMessages(): Promise<Message[]> {
-    return this.get<Message[]>('messages');
+  async getMessages(cursor?: string, first?: number): Promise<MessageConnection> {
+    return this.get<MessageConnection>(`messages?cursor=${cursor}&first=${first}`);
   }
 
   async starMessage(id: string): Promise<Message> {

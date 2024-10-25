@@ -11,12 +11,23 @@ directive @cacheControl(
 
 type Query {
   message(id: String!): Message
-  messages: [Message]
+  messages(cursor: String = null, first: Int = 10): MessageConnection
+}
+
+type Mutation {
+  starMessage(messageId: String!): Message
+  unstarMessage(messageId: String!): Message
+}
+
+type MessageConnection {
+  nodes: [Message!]!
+  cursor: String
+  totalCount: Int!
 }
 
 scalar DateTime
 
-type Message @cacheControl(maxAge: 60) {
+type Message {
   id: String!
   body: String
   labels: [String!]
@@ -24,9 +35,4 @@ type Message @cacheControl(maxAge: 60) {
   sender: String!
   subject: String
   snippet: String
-}
-
-type Mutation {
-  starMessage(messageId: String!): Message
-  unstarMessage(messageId: String!): Message
 }

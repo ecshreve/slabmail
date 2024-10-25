@@ -1,18 +1,29 @@
+import { useQuery } from '@apollo/client';
 import { Star, StarOutline } from '@mui/icons-material';
 import { Box, IconButton, ListItemButton, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { memo } from 'react';
 import { formatDate, formatEmailAddress, stripSpaces } from '../helpers';
-import { Message } from '../types';
+import { GET_MESSAGE_SUMMARY } from '../queries';
+import LoadingSpinner from './LoadingSpinner';
 
 interface MessageListItemProps {
-  message: Message;
+  messageId: string;
   selected: boolean;
   onSelect: () => void;
   onStarClick: () => void;
 }
 
-const MessageListItem: React.FC<MessageListItemProps> = ({ message, selected, onSelect, onStarClick }) => {
+const MessageListItem: React.FC<MessageListItemProps> = ({ messageId, selected, onSelect, onStarClick }) => {
+    const { loading, error, data, fetchMore } = useQuery(GET_MESSAGE_SUMMARY, { variables: { messageId } });
+
+    if (loading) return <LoadingSpinner />;
+    if (error) return <p>Error : {error.message}</p>;
+    if (!data || !data.message) return <p>No data</p>;
+
+    const message = data.message;
+    const starred = message.labels?.includes('STARRED');
+
     const theme = useTheme();
     return (
         <ListItemButton
@@ -34,7 +45,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message, selected, on
             {/* Header: Subject, Sender, Star */}
             <Box display="flex" justifyContent="space-between" width="100%">
                 {/* Email Subject and Sender */}
-                <MessageContent subject={message.subject} sender={message.sender} />
+                <MessageContent subject={message.subject ?? ''} sender={message.sender ?? ''} />
 
                 {/* Star Icon */}
                 <IconButton
@@ -42,7 +53,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message, selected, on
                     edge="end"
                     onClick={onStarClick}
                 >
-                    {message.labels.includes('STARRED') ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
+                    {starred ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
                 </IconButton>
             </Box>
 

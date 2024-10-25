@@ -1,29 +1,45 @@
-import { gql } from "@apollo/client";
+import { gql } from './__generated__/gql';
 
-export const GET_MESSAGE_LIST = gql`
-  query GetMessageList {
-    messages {
-      messageId
+export const GET_MESSAGES_CONNECTION = gql(/* GraphQL */ `
+  query GetMessages($cursor: String, $first: Int) {
+    messages(cursor: $cursor, first: $first) {
+      nodes {
+        id
+        subject
+        labels
+        receivedAt
+        sender
+        body
+        snippet
+      }
+      cursor
+      totalCount
+    }
+  }
+`);
+
+export const GET_MESSAGE_DETAIL = gql(/* GraphQL */ `
+  query GetMessageDetail($messageId: String!) {
+    message(id: $messageId) {
+      id
       subject
       labels
-      receivedMs
+      receivedAt
       sender
       body
       snippet
     }
   }
-`;
+`);
 
-export const GET_MESSAGE_DETAIL = gql`
-  query GetMessageDetail($messageId: ID!) {
-    message(messageId: $messageId) {
-      messageId
+export const GET_MESSAGE_SUMMARY = gql(/* GraphQL */ `
+  query GetMessageSummary($messageId: String!) {
+    message(id: $messageId) {
+      id
       subject
-      labels
-      receivedMs
       sender
-      body
-      snippet
+      receivedAt
+      labels
     }
   }
-`;
+`);

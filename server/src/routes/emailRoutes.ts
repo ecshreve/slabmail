@@ -8,6 +8,7 @@ import {
   fetchMessageById,
   fetchMessageDetails,
   fetchMessages,
+  fetchMessagesPaginated,
   listEmails,
   starMessage,
   unstarMessage,
@@ -140,8 +141,9 @@ router.put("/emails/:id/star/:setStarred", async (req, res) => {
 router.get("/messages", async (req, res) => {
   try {
     const auth = await authorize();
-    const msgList = await fetchMessages(auth);
-    res.status(200).json(msgList);
+    const { cursor, first } = req.query;
+    const response = await fetchMessagesPaginated(auth, cursor as string, Number(first));
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while fetching emails.");

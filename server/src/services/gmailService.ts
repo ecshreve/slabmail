@@ -137,6 +137,47 @@ export async function fetchMessageDetails(
 }
 
 /**
+ * FetchMessagesPaginated
+ * 
+ * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.
+ * @param {string} after The cursor to fetch the next page of messages.
+ * @returns {Promise<any[]>} An array of message objects.
+ */
+export async function fetchMessagesPaginated(auth: Auth.OAuth2Client, after?: string, first?: number): Promise<any> {
+  try {
+    const gmail = google.gmail({ version: "v1", auth });
+    const res = await gmail.users.messages.list({
+      userId: "me",
+      maxResults: first,
+      pageToken: after
+    });
+
+    const messages = res.data.messages;
+    if (!messages || messages.length === 0) {
+      console.log("No messages found.");
+      return [];
+    }
+
+    const messageDetails = await Promise.all(
+      messages.map(async (message) => {
+        return await fetchMessageById(auth, message.id!);
+      })
+    );
+
+    return {
+      messages: {
+        nodes: messageDetails,
+        cursor: res.data.nextPageToken,
+        totalCount: res.data.resultSizeEstimate,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    throw error;
+  }
+}
+
+/**
  * Fetches a list of messages and their details.
  *
  * @param {Auth.OAuth2Client} auth An authorized OAuth2 client.

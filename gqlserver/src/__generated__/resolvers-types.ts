@@ -24,12 +24,19 @@ export enum CacheControlScope {
 export type Message = {
   __typename?: 'Message';
   body?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   labels?: Maybe<Array<Scalars['String']>>;
-  messageId: Scalars['ID'];
-  receivedMs: Scalars['DateTime'];
+  receivedAt: Scalars['DateTime'];
   sender: Scalars['String'];
   snippet?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
+};
+
+export type MessageConnection = {
+  __typename?: 'MessageConnection';
+  cursor?: Maybe<Scalars['String']>;
+  nodes: Array<Message>;
+  totalCount: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -40,23 +47,29 @@ export type Mutation = {
 
 
 export type MutationStarMessageArgs = {
-  messageId: Scalars['ID'];
+  messageId: Scalars['String'];
 };
 
 
 export type MutationUnstarMessageArgs = {
-  messageId: Scalars['ID'];
+  messageId: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
   message?: Maybe<Message>;
-  messages?: Maybe<Array<Maybe<Message>>>;
+  messages?: Maybe<MessageConnection>;
 };
 
 
 export type QueryMessageArgs = {
-  messageId: Scalars['ID'];
+  id: Scalars['String'];
+};
+
+
+export type QueryMessagesArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -132,9 +145,9 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CacheControlScope: CacheControlScope;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Message: ResolverTypeWrapper<Message>;
+  MessageConnection: ResolverTypeWrapper<MessageConnection>;
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -144,9 +157,9 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
   DateTime: Scalars['DateTime'];
-  ID: Scalars['ID'];
   Int: Scalars['Int'];
   Message: Message;
+  MessageConnection: MessageConnection;
   Mutation: {};
   Query: {};
   String: Scalars['String'];
@@ -166,12 +179,19 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 
 export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
   body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   labels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  messageId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  receivedMs?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  receivedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   sender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   snippet?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   subject?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type MessageConnectionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['MessageConnection'] = ResolversParentTypes['MessageConnection']> = ResolversObject<{
+  cursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  nodes?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -181,13 +201,14 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'messageId'>>;
-  messages?: Resolver<Maybe<Array<Maybe<ResolversTypes['Message']>>>, ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'id'>>;
+  messages?: Resolver<Maybe<ResolversTypes['MessageConnection']>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'cursor' | 'first'>>;
 }>;
 
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
   DateTime?: GraphQLScalarType;
   Message?: MessageResolvers<ContextType>;
+  MessageConnection?: MessageConnectionResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;
