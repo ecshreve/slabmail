@@ -1,10 +1,21 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { ThemeProvider } from '@mui/material/styles';
+import * as ReactDOM from 'react-dom/client';
+import App from './App';
+import theme from './styles/theme';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const client = new ApolloClient({
+  uri: 'http://localhost:4000/graphql',
+  cache: new InMemoryCache(),
+});
+
+// Supported in React 18+
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+
+root.render(
+  <ApolloProvider client={client}>
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
+  </ApolloProvider>,
+);
