@@ -6,10 +6,19 @@ import { GET_MESSAGE_LIST } from '../queries';
 import { Message } from '../types';
 import MessageListItem from './MessageListItem';
 
-export const MessageList = () => {
+interface MessageListProps {
+  onMessageSelect: (messageId: string) => void;
+}
+
+export const MessageList = ({ onMessageSelect }: MessageListProps) => {
   const { loading, error, data } = useQuery(GET_MESSAGE_LIST);
   const [filterStarred, setFilterStarred] = useState(false);
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+
+  const handleMessageSelect = (messageId: string) => {
+    setSelectedMessageId(messageId);
+    onMessageSelect(messageId);
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error : {error.message}</p>;
@@ -34,13 +43,13 @@ export const MessageList = () => {
         </Paper>
       </Box>
       <List>
-        {data.messages.map((email: Message) => (
+        {data.messages.map((message: Message) => (
           <MessageListItem
-            key={email.messageId}
-            email={email}
-            selected={selectedEmailId === email.messageId}
-            onSelect={() => setSelectedEmailId(email.messageId)}
-            onStarClick={() => onStarClick(email)}
+            key={message.messageId}
+            message={message}
+            selected={selectedMessageId === message.messageId}
+            onSelect={() => handleMessageSelect(message.messageId)}
+            onStarClick={() => onStarClick(message)}
           />
         ))}
       </List>

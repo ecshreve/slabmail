@@ -13,3 +13,17 @@ export const GET_MESSAGE_LIST = gql`
     }
   }
 `;
+
+export const GET_MESSAGE_DETAIL = gql`
+  query GetMessageDetail($messageId: ID!) {
+    message(messageId: $messageId) {
+      messageId
+      subject
+      labels
+      receivedMs
+      sender
+      body
+      snippet
+    }
+  }
+`;

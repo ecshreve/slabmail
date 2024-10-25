@@ -25,7 +25,7 @@ export type Message = {
   __typename?: 'Message';
   body?: Maybe<Scalars['String']>;
   labels?: Maybe<Array<Scalars['String']>>;
-  messageId: Scalars['String'];
+  messageId: Scalars['ID'];
   receivedMs: Scalars['DateTime'];
   sender: Scalars['String'];
   snippet?: Maybe<Scalars['String']>;
@@ -40,12 +40,12 @@ export type Mutation = {
 
 
 export type MutationStarMessageArgs = {
-  id: Scalars['ID'];
+  messageId: Scalars['ID'];
 };
 
 
 export type MutationUnstarMessageArgs = {
-  id: Scalars['ID'];
+  messageId: Scalars['ID'];
 };
 
 export type Query = {
@@ -56,7 +56,7 @@ export type Query = {
 
 
 export type QueryMessageArgs = {
-  id: Scalars['ID'];
+  messageId: Scalars['ID'];
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -167,7 +167,7 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
   body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   labels?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  messageId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  messageId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   receivedMs?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   sender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   snippet?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -176,12 +176,12 @@ export type MessageResolvers<ContextType = MyContext, ParentType extends Resolve
 }>;
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  starMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<MutationStarMessageArgs, 'id'>>;
-  unstarMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<MutationUnstarMessageArgs, 'id'>>;
+  starMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<MutationStarMessageArgs, 'messageId'>>;
+  unstarMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<MutationUnstarMessageArgs, 'messageId'>>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'id'>>;
+  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessageArgs, 'messageId'>>;
   messages?: Resolver<Maybe<Array<Maybe<ResolversTypes['Message']>>>, ParentType, ContextType>;
 }>;
 

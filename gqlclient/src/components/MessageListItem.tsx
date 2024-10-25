@@ -1,11 +1,18 @@
-import { ListItemButton, ListItemText, IconButton, Box } from '@mui/material';
 import { Star, StarOutline } from '@mui/icons-material';
-import { stripSpaces, formatEmailAddress } from '../helpers'
-import { memo } from 'react';
-import { Message } from '../types';
+import { Box, IconButton, ListItemButton, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { memo } from 'react';
+import { formatEmailAddress, stripSpaces } from '../helpers';
+import { Message } from '../types';
 
-const MessageListItem: React.FC<{ email: Message; selected: boolean; onSelect: () => void; onStarClick: () => void }> = ({ email, selected, onSelect, onStarClick }) => {
+interface MessageListItemProps {
+  message: Message;
+  selected: boolean;
+  onSelect: () => void;
+  onStarClick: () => void;
+}
+
+const MessageListItem: React.FC<MessageListItemProps> = ({ message, selected, onSelect, onStarClick }) => {
     const theme = useTheme();
     return (
         <ListItemButton
@@ -27,7 +34,7 @@ const MessageListItem: React.FC<{ email: Message; selected: boolean; onSelect: (
             {/* Header: Subject, Sender, Star */}
             <Box display="flex" justifyContent="space-between" width="100%">
                 {/* Email Subject and Sender */}
-                <MessageContent subject={email.subject} sender={email.sender} />
+                <MessageContent subject={message.subject} sender={message.sender} />
 
                 {/* Star Icon */}
                 <IconButton
@@ -35,13 +42,13 @@ const MessageListItem: React.FC<{ email: Message; selected: boolean; onSelect: (
                     edge="end"
                     onClick={onStarClick}
                 >
-                    {email.labels.includes('STARRED') ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
+                    {message.labels.includes('STARRED') ? <Star sx={{ color: '#fbc02d' }} /> : <StarOutline />}
                 </IconButton>
             </Box>
 
             {/* Footer: Email Date */}
             <Box display="flex" width="100%" justifyContent="flex-end">
-                <MessageFooter date={email.receivedAt} />
+                <MessageFooter date={message.receivedAt} />
             </Box>
         </ListItemButton>
     );
