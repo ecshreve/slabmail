@@ -1,0 +1,18 @@
+type Query {
+  message(id: ID!): Message
+  messages: [Message]
+}
+
+type Message {
+  messageId: String!
+  sender: String!
+  recipient: String!
+  subject: String!
+  body: String!
+  labels: [String!]!
+}
+
+type Mutation {
+  starMessage(id: ID!): Message
+  unstarMessage(id: ID!): Message
+}
