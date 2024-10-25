@@ -2,7 +2,7 @@ import { Star, StarOutline } from '@mui/icons-material';
 import { Box, IconButton, ListItemButton, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { memo } from 'react';
-import { formatEmailAddress, stripSpaces } from '../helpers';
+import { formatDate, formatEmailAddress, stripSpaces } from '../helpers';
 import { Message } from '../types';
 
 interface MessageListItemProps {
@@ -48,7 +48,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message, selected, on
 
             {/* Footer: Email Date */}
             <Box display="flex" width="100%" justifyContent="flex-end">
-                <MessageFooter date={message.receivedAt} />
+                <MessageFooter date={formatDate(message.receivedAt)} />
             </Box>
         </ListItemButton>
     );

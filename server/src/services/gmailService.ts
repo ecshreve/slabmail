@@ -177,6 +177,7 @@ export async function fetchMessageById(
       id: id,
     });
     const messageDetails = {
+      id: msg.data.id,
       messageId: msg.data.id,
       sender: msg.data.payload?.headers?.find(
         (header) => header.name === "From"

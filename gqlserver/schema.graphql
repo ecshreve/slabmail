@@ -10,23 +10,23 @@ directive @cacheControl(
 ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
 type Query {
-  message(messageId: ID!): Message
+  message(id: String!): Message
   messages: [Message]
 }
 
 scalar DateTime
 
 type Message @cacheControl(maxAge: 60) {
-  messageId: ID!
+  id: String!
+  body: String
+  labels: [String!]
+  receivedAt: DateTime!
   sender: String!
   subject: String
   snippet: String
-  body: String
-  receivedMs: DateTime!
-  labels: [String!]
 }
 
 type Mutation {
-  starMessage(messageId: ID!): Message
-  unstarMessage(messageId: ID!): Message
+  starMessage(messageId: String!): Message
+  unstarMessage(messageId: String!): Message
 }

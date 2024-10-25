@@ -1,9 +1,9 @@
 export type Message = {
-  messageId: string;
-  subject: string;
+  id: string;
+  body?: string;
   labels: string[];
   receivedAt: string;
   sender: string;
   snippet?: string;
-  body?: string;
+  subject: string;
 };
