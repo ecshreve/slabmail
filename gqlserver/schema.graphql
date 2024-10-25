@@ -1,3 +1,14 @@
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheControlScope
+  inheritMaxAge: Boolean
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
 type Query {
   message(id: ID!): Message
   messages: [Message]
@@ -5,7 +16,7 @@ type Query {
 
 scalar DateTime
 
-type Message {
+type Message @cacheControl(maxAge: 60) {
   messageId: String!
   sender: String!
   subject: String
