@@ -12,7 +12,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import React, { useState } from 'react';
 import { Email } from '../../types/Email';
 import { db } from '../../utils/dbdexie';
-import tracer from '../../utils/otel';
 import CustomPagination from '../shared/CustomPagination';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import EmailListItem from './EmailListItem';
@@ -26,10 +25,8 @@ const EmailList: React.FC<EmailListProps> = ({ selectedEmailId, onSelect, onStar
   const [filterStarred, setFilterStarred] = useState<boolean>(false);
 
   const emails = useLiveQuery(async () => {
-    tracer.startActiveSpan("EmailList", async (span) => {
-      const emails = await db.emails.toArray();
-      return emails.filter((email) => filterStarred ? email.starred : true);
-    });
+    const emails = await db.emails.toArray();
+    return emails.filter((email) => filterStarred ? email.starred : true);
   }, [filterStarred]);
 
   if (!emails) return (<LoadingSpinner />);
@@ -62,7 +59,7 @@ const EmailList: React.FC<EmailListProps> = ({ selectedEmailId, onSelect, onStar
         </Paper>
       </Box>
       <List>
-        {emails.map((em ail) => (
+        {emails.map((email: Email) => (
           <EmailListItem
             key={email.id}
             email={email}

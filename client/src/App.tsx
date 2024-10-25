@@ -5,25 +5,16 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Inbox from './pages/Inbox';
 import theme from './styles/theme';
 import tracer from './utils/otel';
+import { refreshEmails } from './utils/sync';
 
 const App: React.FC = () => {
-  // useEffect(() => {
-  //   refreshEmails()
-  // }, [])
-
   useEffect(() => {
-    const span = tracer.startSpan("App");
-
-    const handleUnload = () => {
-      span.end();
-    };
-
-    window.addEventListener("unload", handleUnload);
-
-    return () => {
-      window.removeEventListener("unload", handleUnload);
-      span.end(); // Ensure the span is ended when the component unmounts
-    };
+    tracer.startActiveSpan("App", async (span) => {
+      await refreshEmails();
+      window.addEventListener("unload", () => {
+        span.end();
+      });
+    });
   }, []);
 
   return (

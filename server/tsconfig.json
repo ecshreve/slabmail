@@ -1,9 +1,0 @@
-{
-  "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",    // Output directory for compiled JS files
-    "lib": ["esnext"],
-  },
-  "include": ["src/**/*"],  // Specify where TypeScript source files are located
-  "exclude": ["node_modules"]  // Exclude node_modules from being compiled
-}

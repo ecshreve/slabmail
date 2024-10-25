@@ -24,27 +24,25 @@ db.on("populate", async () => {
 
 export const getEmailById = async (id: string) => {
   tracer.startActiveSpan("getEmailById", async (span) => {
-    await db.emails.get(id);
+    const email = await db.emails.get(id);
     span.end();
+    return email;
   });
 };
 
-export const updateEmail = async (id: string, email: Partial<Email>) => {
-  tracer.startActiveSpan("updateEmail", async (span) => {
-    await db.emails.update(id, email);
-    span.end();
-  });
-};
-
-export const starEmail = async (email: Email) => {
+export const starEmail = (email: Email) => {
   tracer.startActiveSpan("starEmail", async (span) => {
-    const newLabelIds = email.starred
+    const newLabelIds = !email.starred
       ? [...email.labelIds, STARRED_LABEL_ID]
       : email.labelIds.filter((labelId) => labelId !== STARRED_LABEL_ID);
-    await db.emails.update(email.id, {
+
+    const updatedEmail = {
+      ...email,
       labelIds: newLabelIds,
       starred: !email.starred,
-    });
+    };
+
+    await db.emails.put(updatedEmail);
     span.end();
   });
 };
