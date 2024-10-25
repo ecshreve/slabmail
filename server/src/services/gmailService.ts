@@ -144,13 +144,23 @@ export async function fetchMessageDetails(
  * @returns {Promise<any[]>} An array of message objects.
  */
 export async function fetchMessagesPaginated(auth: Auth.OAuth2Client, after?: string, first?: number): Promise<any> {
+  interface Args {
+    userId: string;
+    maxResults: number;
+    pageToken?: string;
+  }
+
+  const args: Args = {
+    userId: "me",
+    maxResults: first ?? 10,
+  }
+  if (after) {
+    args.pageToken = after;
+  }
+  
   try {
     const gmail = google.gmail({ version: "v1", auth });
-    const res = await gmail.users.messages.list({
-      userId: "me",
-      maxResults: first,
-      pageToken: after
-    });
+    const res = await gmail.users.messages.list(args);
 
     const messages = res.data.messages;
     if (!messages || messages.length === 0) {
@@ -165,11 +175,9 @@ export async function fetchMessagesPaginated(auth: Auth.OAuth2Client, after?: st
     );
 
     return {
-      messages: {
-        nodes: messageDetails,
-        cursor: res.data.nextPageToken,
-        totalCount: res.data.resultSizeEstimate,
-      },
+      nodes: messageDetails!,
+      cursor: res.data.nextPageToken!,
+      totalCount: res.data.resultSizeEstimate!,
     };
   } catch (error) {
     console.error("Error fetching messages:", error);

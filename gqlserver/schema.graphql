@@ -11,7 +11,7 @@ directive @cacheControl(
 
 type Query {
   message(id: String!): Message
-  messages(cursor: String = null, first: Int = 10): MessageConnection
+  messages(after: String = null, first: Int = 10): MessageConnection
 }
 
 type Mutation {
@@ -21,18 +21,16 @@ type Mutation {
 
 type MessageConnection {
   nodes: [Message!]!
-  cursor: String
+  nextPageCursor: String
   totalCount: Int!
 }
-
-scalar DateTime
 
 type Message {
   id: String!
   body: String
   labels: [String!]
-  receivedAt: DateTime!
-  sender: String!
+  receivedAt: String
+  sender: String
   subject: String
   snippet: String
 }

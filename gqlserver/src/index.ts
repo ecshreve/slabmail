@@ -3,7 +3,6 @@ import "./otel.js";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "fs";
-import { MessagesDataSource } from "./datasources.js";
 import resolvers from "./resolvers/index.js";
 import { SlabmailAPI } from "./slabmail-api.js";
 
@@ -13,7 +12,6 @@ const typeDefs = readFileSync("./schema.graphql", { encoding: "utf-8" });
 
 export interface MyContext {
   dataSources: {
-    messagesAPI: MessagesDataSource;
     slabmailAPI: SlabmailAPI;
   };
 }
@@ -32,7 +30,6 @@ const { url } = await startStandaloneServer(server, {
       // this would be where you'd add your data source connections
       // or your REST API classes.
       dataSources: {
-        messagesAPI: new MessagesDataSource(),
         slabmailAPI: new SlabmailAPI(),
       },
     };

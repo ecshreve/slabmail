@@ -1,6 +1,5 @@
 // src/components/MessageDetail.tsx
 
-import { useQuery } from '@apollo/client';
 import { Star, StarOutline } from '@mui/icons-material';
 import {
     Box,
@@ -8,52 +7,47 @@ import {
     Divider,
     IconButton,
     Paper,
+    Skeleton,
     Typography
 } from '@mui/material';
 import { memo } from 'react';
+import { useInboxDispatch, useInboxState } from '../contexts/InboxContext';
 import { formatDate, formatEmailAddress } from '../helpers';
-import { GET_MESSAGE_DETAIL } from '../queries';
-import LoadingSpinner from './LoadingSpinner';
 
+const MessageDetail: React.FC = () => {
+    const state = useInboxState();
+    const dispatch = useInboxDispatch();
+    const message = state.selectedMessage;
 
-interface MessageDetailProps {
-    messageId: string;
-    onStarClick: () => void;
-}
-
-const MessageDetail: React.FC<MessageDetailProps> = ({ messageId, onStarClick }) => {
-    const { loading, error, data } = useQuery(GET_MESSAGE_DETAIL, { variables: { messageId } });
-
-    if (loading) return <LoadingSpinner />;
-    if (error) return <p>Error: {error.message}</p>;
-    if (!data || !data.message) return <p>No data</p>;
-
-    const message = data.message;
-
+    if (!message) return <MessageDetailSkeleton />;
     return (
         <>
-            {message && (
-                <Box flex={2} p={2} overflow="auto">
-                    {/* Message Header */}
-                    <MessageHeader
-                        subject={message.subject ?? ''}
-                        starred={message.labels?.includes('STARRED') ?? false}
-                        onClick={onStarClick}
-                    />
+            <Box flex={2} p={2} overflow="auto">
+                {/* Message Header */}
+                <MessageHeader
+                    subject={message.subject ?? ''}
+                    starred={state.starredMessages.some((m) => m.id === message.id)}
+                    onClick={() => dispatch({ type: 'TOGGLE_STARRED_MESSAGE', payload: message })}
+                />
 
-                    <MessageInfo sender={message.sender} date={formatDate(message.receivedMs)} />
+                <MessageInfo sender={message.sender} date={formatDate(message.receivedAt)} />
 
-                    {/* Action Buttons */}
-                    <MessageActions onDelete={() => { }} />
+                {/* Action Buttons */}
+                <MessageActions onDelete={() => { /* Implement delete logic */ }} />
 
-                    <Divider sx={{ my: 2 }} />
+                <Divider sx={{ my: 2 }} />
 
-                    {/* Message Body */}
-                    {message.body && <MessageBody body={message.body} />}
-                </Box>
-            )}
+                {/* Message Body */}
+                {message.body && <MessageBody body={message.body} />}
+            </Box>
         </>
     );
+};
+
+const MessageDetailSkeleton = () => {
+    return <Box flex={2} p={2} overflow="auto">
+        <Skeleton variant="text" height={60} />
+    </Box>;
 };
 
 // Message Header Component

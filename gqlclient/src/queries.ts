@@ -1,18 +1,17 @@
 import { gql } from './__generated__/gql';
 
 export const GET_MESSAGES_CONNECTION = gql(/* GraphQL */ `
-  query GetMessages($cursor: String, $first: Int) {
-    messages(cursor: $cursor, first: $first) {
+  query GetMessages($after: String, $first: Int) {
+    messages(after: $after, first: $first) {
       nodes {
         id
         subject
         labels
         receivedAt
         sender
-        body
         snippet
       }
-      cursor
+      nextPageCursor
       totalCount
     }
   }

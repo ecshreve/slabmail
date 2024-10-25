@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
-    "\n  query GetMessages($cursor: String, $first: Int) {\n    messages(cursor: $cursor, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        body\n        snippet\n      }\n      cursor\n      totalCount\n    }\n  }\n": types.GetMessagesDocument,
+    "\n  query GetMessages($after: String, $first: Int) {\n    messages(after: $after, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        snippet\n      }\n      nextPageCursor\n      totalCount\n    }\n  }\n": types.GetMessagesDocument,
     "\n  query GetMessageDetail($messageId: String!) {\n    message(id: $messageId) {\n      id\n      subject\n      labels\n      receivedAt\n      sender\n      body\n      snippet\n    }\n  }\n": types.GetMessageDetailDocument,
     "\n  query GetMessageSummary($messageId: String!) {\n    message(id: $messageId) {\n      id\n      subject\n      sender\n      receivedAt\n      labels\n    }\n  }\n": types.GetMessageSummaryDocument,
 };
@@ -36,7 +36,7 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetMessages($cursor: String, $first: Int) {\n    messages(cursor: $cursor, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        body\n        snippet\n      }\n      cursor\n      totalCount\n    }\n  }\n"): (typeof documents)["\n  query GetMessages($cursor: String, $first: Int) {\n    messages(cursor: $cursor, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        body\n        snippet\n      }\n      cursor\n      totalCount\n    }\n  }\n"];
+export function gql(source: "\n  query GetMessages($after: String, $first: Int) {\n    messages(after: $after, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        snippet\n      }\n      nextPageCursor\n      totalCount\n    }\n  }\n"): (typeof documents)["\n  query GetMessages($after: String, $first: Int) {\n    messages(after: $after, first: $first) {\n      nodes {\n        id\n        subject\n        labels\n        receivedAt\n        sender\n        snippet\n      }\n      nextPageCursor\n      totalCount\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

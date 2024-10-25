@@ -8,8 +8,8 @@ export class SlabmailAPI extends RESTDataSource {
     return this.get<Message>(`messages/${encodeURIComponent(id)}`);
   }
 
-  async getMessages(cursor?: string, first?: number): Promise<MessageConnection> {
-    return this.get<MessageConnection>(`messages?cursor=${cursor}&first=${first}`);
+  async getMessages(after?: number, first?: number): Promise<MessageConnection> {
+    return this.get<MessageConnection>(`messages?${after ? `after=${after}` : ''}${first ? `&first=${first}` : ''}`);
   }
 
   async starMessage(id: string): Promise<Message> {
