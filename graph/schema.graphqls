@@ -1,0 +1,66 @@
+# graph/schema.graphqls
+directive @goModel(
+    model: String
+    models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+directive @goEnum(
+    value: String
+) on ENUM_VALUE
+
+directive @goTag(
+  key: String!
+  value: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+directive @goExtraField(
+	name: String
+	type: String!
+	overrideTags: String
+	description: String
+) repeatable on OBJECT | INPUT_OBJECT
+
+
+# Input Types
+input MessageFilterInput {
+  isStarred: Boolean
+  sender: String
+}
+
+input PaginationInput {
+  limit: Int
+  offset: Int
+}
+
+# Object Types
+type Message {
+  id: ID! @goTag(key: "gorm", value: "primaryKey")
+  gmailId: String! @goTag(key: "gorm", value: "type:text")
+  threadId: String! @goTag(key: "gorm", value: "type:text")
+  subject: String! @goTag(key: "gorm", value: "type:text")
+  body: String! @goTag(key: "gorm", value: "type:text")
+  sender: String! @goTag(key: "gorm", value: "type:text")
+  timestamp: String! @goTag(key: "gorm", value: "type:text")
+  isStarred: Boolean! @goTag(key: "gorm", value: "type:boolean")
+}
+
+enum Label {
+  STARRED
+  UNREAD
+  IMPORTANT
+  SPAM
+  TRASH
+  DRAFT
+  SENT
+  INBOX
+  OUTBOX
+  SCHEDULED
+}
+
+type Query {
+  messages(pagination: PaginationInput): [Message!]!
+}
+
+type Mutation {
+  toggleStarred(messageId: ID!): Message!
+}

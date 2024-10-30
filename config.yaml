@@ -1,0 +1,6 @@
+PORT: "8008"
+POSTGRES_DSN: "postgres://postgres:postgres@127.0.0.1:5432/smail"
+REDIS_ADDR: "localhost:6379"
+REDIS_PASSWORD: "password"
+REDIS_DB: "defaultdb"
+GMAIL_ACCESS_TOKEN: ""
